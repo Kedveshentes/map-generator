@@ -125,14 +125,15 @@ hallway = {
 		]
 	},
 	drawHallway : function (x, y, type, magnification) {
+		var blockSize = magnification / 5;
 		for (var i = 0; i < this.hallwayTypes[type].length; i++) {
 			for (var j = 0; j < this.hallwayTypes[type].length; j++) {
 				if (hallway.hallwayTypes[type][j][i] == 1) {
 					canvas.fillStyle = 'rgb(230, 230, 230)';
-					canvas.fillRect(x + i * 10, y + j * 10, 10, 10);
+					canvas.fillRect(x + i * blockSize, y + j * blockSize, blockSize, blockSize);
 				} else {
 					canvas.fillStyle = 'rgb(90, 90, 90)';
-					canvas.fillRect(x + i * 10, y + j * 10, 10, 10);
+					canvas.fillRect(x + i * blockSize, y + j * blockSize, blockSize, blockSize);
 				}
 			}
 		}
@@ -200,6 +201,10 @@ Map.prototype.drawMap = function () {
 		x = blocksToInitialize[0].x;
 		y = blocksToInitialize[0].y;
 
+		if (this.map[x][y] !== 0) {
+			blocksToInitialize.shift();
+			continue;
+		}
 
 		if (y !== 0 && (this.map[x][y - 1] !== 0 && hallway.hallwayTypes[ this.map[x][y - 1] ][4][2] === 1)) {
 			isGoingUpObligatory = true;
@@ -235,100 +240,55 @@ Map.prototype.drawMap = function () {
 				(isGoingLeftObligatory  && hallway.hallwayTypes[possibleHallwayTypes[j]][2][0] == 1 || isGoingLeftForbidden  && hallway.hallwayTypes[possibleHallwayTypes[j]][2][0] === 0 || !isGoingLeftObligatory  && !isGoingLeftForbidden)) {
 				validHallwayTypes.push(j);
 			}
+		}
 
-
-			/*if (
-				((!isGoingUpPossible    && hallway.hallwayTypes[possibleHallwayTypes[j]][0][2] == 0)) ||
-				((!isGoingRightPossible && hallway.hallwayTypes[possibleHallwayTypes[j]][2][4] == 0)) ||
-				((!isGoingDownPossible  && hallway.hallwayTypes[possibleHallwayTypes[j]][4][2] == 0)) ||
-				((!isGoingLeftPossible  && hallway.hallwayTypes[possibleHallwayTypes[j]][2][0] == 0))
-				) {
-				// console.log(j);
-				} else {
-					validHallwayTypes.push(j);
-				}*/
+		for (var i = 11; i < 15; i++) {
+			if (validHallwayTypes.length > 1) {	
+				if (validHallwayTypes.indexOf(i) !== -1) {
+					validHallwayTypes.splice(validHallwayTypes.indexOf(i), 1);
+				}
+			}
 		}
 
 		hallwayType = _.sample(validHallwayTypes);
-		hallway.drawHallway(x * this.hallwaysize, y * this.hallwaysize, hallwayType, that.hallwaysize);
-		this.map[x][y] = hallwayType;
+		if (hallwayType !== undefined) {
+			hallway.drawHallway(x * this.hallwaysize, y * this.hallwaysize, hallwayType, this.hallwaysize);
+		}
+		this.map[x][y] = hallwayType || 0;
 
-		blocksToInitialize.shift();
-
-		if (hallway.hallwayTypes[hallwayType][0][2] == 1) {
+		if (hallway.hallwayTypes[hallwayType][0][2] == 1 && this.map[x][y - 1] === 0) {
 			blocksToInitialize.push({
 				x : x,
 				y : y - 1
 			});
 		}
-		if (hallway.hallwayTypes[hallwayType][2][4] == 1) {
+		if (hallway.hallwayTypes[hallwayType][2][4] == 1 && this.map[x + 1][y] === 0) {
 			blocksToInitialize.push({
 				x : x + 1,
 				y : y
 			});
 		}
-		if (hallway.hallwayTypes[hallwayType][4][2] == 1) {
+		if (hallway.hallwayTypes[hallwayType][4][2] == 1 && this.map[x][y + 1] === 0) {
 			blocksToInitialize.push({
 				x : x,
 				y : y + 1
 			});
 		}
-		if (hallway.hallwayTypes[hallwayType][2][0] == 1) {
+		if (hallway.hallwayTypes[hallwayType][2][0] == 1 && this.map[x - 1][y] === 0) {
 			blocksToInitialize.push({
 				x : x - 1,
 				y : y
 			});
 		}
 
+		blocksToInitialize.shift();
+
 		count++;
 	}
-	while (count < 80);
-
-
-
-
-
-
-	/*for (var i = 0; i < 30; i++) {
-			hallwayType = Math.round(Math.random() * 14 + 1);
-			if (hallway.hallwayTypes[hallwayType][0][2]) {      // top edge is a road
-				var hallwayAboveCurrentOne = hallway.hallwayTypes[this.map[x][y - 1]];
-				if (y - 1 * this.hallwaysize < 0 || hallwayAboveCurrentOne[4][2] === 0) {
-					isCurrentHallwayTypeOkay = false;
-				}
-			}
-			if (hallway.hallwayTypes[hallwayType][2][4]) {      // right edge is a road
-				if (true) {
-
-				}
-			}
-			if (hallway.hallwayTypes[hallwayType][4][2]) {      // bottom edge is a road
-				if (true) {
-
-				}
-			}
-			if (hallway.hallwayTypes[hallwayType][2][1]) {      // left edge is a road
-				if (true) {
-
-				}
-			}
-	}*/
-
-
-
-
-
-
-	/*for (var i = 0; i < that.width; i++) {
-		for (var j = 0; j < that.height; j++) {
-			hallwayType = Math.round(Math.random() * 14 + 1);
-			that.map[i][j] = hallwayType;
-			hallway.drawHallway(i * this.hallwaysize, j * this.hallwaysize, hallwayType, that.hallwaysize);
-		}
-	}*/
+	while (blocksToInitialize.length > 0);
 };
 
-var map = new Map(10, 10, 50);
+var map = new Map(50, 50, 10);
 
 map.generateMap();
 map.drawMap();
