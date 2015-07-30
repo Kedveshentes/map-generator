@@ -83,19 +83,59 @@ Map.prototype.generateMap = function (roomWidthMin, roomWidthMax, roomHeightMin,
 		}
 	};
 
-	var generateLabyrinth = function () {
-		
+	var start = {
+		x : 1,
+		y : 1
+	};
+	var generateLabyrinth = function (currentPosition) {
+		var directions = [];
+		if ( // up
+			(that.map[currentPosition.x - 1][currentPosition.y + 2] !== 1) &&
+			(that.map[currentPosition.x    ][currentPosition.y + 2] !== 1) &&
+			(that.map[currentPosition.x + 1][currentPosition.y + 2] !== 1) &&
+			(that.map[currentPosition.x - 1][currentPosition.y + 1] !== 1) &&
+			(that.map[currentPosition.x    ][currentPosition.y + 1] !== 1) &&
+			(that.map[currentPosition.x + 1][currentPosition.y + 1] !== 1)
+		) {
+			directions.push(0);
+		}
+		if ( // right
+			(that.map[currentPosition.x + 1][currentPosition.y + 1] !== 1) &&
+			(that.map[currentPosition.x + 1][currentPosition.y    ] !== 1) &&
+			(that.map[currentPosition.x + 1][currentPosition.y - 1] !== 1) &&
+			(that.map[currentPosition.x + 2][currentPosition.y + 1] !== 1) &&
+			(that.map[currentPosition.x + 2][currentPosition.y    ] !== 1) &&
+			(that.map[currentPosition.x + 2][currentPosition.y - 1] !== 1)
+		) {
+			directions.push(1);
+		}
+		if ( // down
+			(that.map[currentPosition.x - 1][currentPosition.y - 2] !== 1) &&
+			(that.map[currentPosition.x    ][currentPosition.y - 2] !== 1) &&
+			(that.map[currentPosition.x + 1][currentPosition.y - 2] !== 1) &&
+			(that.map[currentPosition.x - 1][currentPosition.y - 1] !== 1) &&
+			(that.map[currentPosition.x    ][currentPosition.y - 1] !== 1) &&
+			(that.map[currentPosition.x + 1][currentPosition.y - 1] !== 1)
+		) {
+			directions.push(2);
+		}
+		if ( // left
+			(that.map[currentPosition.x - 1][currentPosition.y + 1] !== 1) &&
+			(that.map[currentPosition.x - 1][currentPosition.y    ] !== 1) &&
+			(that.map[currentPosition.x - 1][currentPosition.y - 1] !== 1) &&
+			(that.map[currentPosition.x - 2][currentPosition.y + 1] !== 1) &&
+			(that.map[currentPosition.x - 2][currentPosition.y    ] !== 1) &&
+			(that.map[currentPosition.x - 2][currentPosition.y - 1] !== 1)
+		) {
+			directions.push(3);
+		}
 	};
 
 	generateRooms();
-	var string = '';
-	for (var i = 0; i < this.width; i++) {
-		for (var j = 0; j < this.height; j++) {
-			string += this.map[j][i] + ' ';
-		}
-		console.log(string);
-		string = '';
-	}
+	generateLabyrinth(start);
+
+
+
 
 
 	/*var count = 0;
