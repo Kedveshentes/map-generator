@@ -90,82 +90,72 @@
 			}
 		}
 	};
-    Labyrinth.prototype.generateLabyrinth = function (start) {
+    Labyrinth.prototype.generateLabyrinth = function (start, randomFactor) {
         var roadStack  = [],
             that       = this;
 
-        function recGenerate (currentTile, canPushMoreDeadEnds) {
-            var possibleDirections = [],
-                nextBlock,
-                direction;
+        var currentTile = start;
 
-            // that.map[currentTile.x][currentTile.y] = 1;
+        roadStack.push(currentTile);
 
-            // if (currentTile.y > 1) {
-            //     var isGoingUpPossible = true;
-            //     for (var y = -2; y < 0; y++) {
-            //         for (var x = -1; x < 2; x++) {
-            //             isGoingUpPossible = isGoingUpPossible && (that.map[currentTile.x + x][currentTile.y + y] !== 1) && (that.map[currentTile.x + x][currentTile.y + y] !== 2);
-            //         }
-            //     }
-            //     if (isGoingUpPossible) {
-            //         possibleDirections.push(directions[0]);
-            //     }
-            // }
+        var possibleDirections;
+        var nextBlock;
+        var direction;
+        var canPushMoreDeadEnds = true;
 
-            if (currentTile.y > 2 &&
-                (that.map[currentTile.x - 1][currentTile.y - 3] !== 1) &&
-                (that.map[currentTile.x    ][currentTile.y - 3] !== 1) &&
-                (that.map[currentTile.x + 1][currentTile.y - 3] !== 1) &&
-                (that.map[currentTile.x - 1][currentTile.y - 2] !== 1) && (that.map[currentTile.x - 1][currentTile.y - 2] !== 2) &&
-                (that.map[currentTile.x    ][currentTile.y - 2] !== 1) && (that.map[currentTile.x    ][currentTile.y - 2] !== 2) &&
-                (that.map[currentTile.x + 1][currentTile.y - 2] !== 1) && (that.map[currentTile.x + 1][currentTile.y - 2] !== 2) &&
-                (that.map[currentTile.x - 1][currentTile.y - 1] !== 1) && (that.map[currentTile.x - 1][currentTile.y - 1] !== 2) &&
-                (that.map[currentTile.x    ][currentTile.y - 1] !== 1) && (that.map[currentTile.x    ][currentTile.y - 1] !== 2) &&
-                (that.map[currentTile.x + 1][currentTile.y - 1] !== 1) && (that.map[currentTile.x + 1][currentTile.y - 1] !== 2)
-            ) {
-                possibleDirections.push(directions[0]);
-            }
-            // maximum call stack size exceeded
+        while (roadStack.length > 0) {
+            possibleDirections = [];
+            that.map[currentTile.x][currentTile.y] = 1;
 
-            if (currentTile.x < that.width - 3 &&
-                (that.map[currentTile.x + 1][currentTile.y - 1] !== 1) && (that.map[currentTile.x + 1][currentTile.y - 1] !== 2) &&
-                (that.map[currentTile.x + 1][currentTile.y    ] !== 1) && (that.map[currentTile.x + 1][currentTile.y    ] !== 2) &&
-                (that.map[currentTile.x + 1][currentTile.y + 1] !== 1) && (that.map[currentTile.x + 1][currentTile.y + 1] !== 2) &&
-                (that.map[currentTile.x + 2][currentTile.y - 1] !== 1) && (that.map[currentTile.x + 2][currentTile.y - 1] !== 2) &&
-                (that.map[currentTile.x + 2][currentTile.y    ] !== 1) && (that.map[currentTile.x + 2][currentTile.y    ] !== 2) &&
-                (that.map[currentTile.x + 2][currentTile.y + 1] !== 1) && (that.map[currentTile.x + 2][currentTile.y + 1] !== 2) &&
-                (that.map[currentTile.x + 3][currentTile.y - 1] !== 1) &&
-                (that.map[currentTile.x + 3][currentTile.y    ] !== 1) &&
-                (that.map[currentTile.x + 3][currentTile.y + 1] !== 1)
-            ) {
-                possibleDirections.push(directions[1]);
-            }
-            if (currentTile.y < that.height - 3 &&
-                (that.map[currentTile.x - 1][currentTile.y + 3] !== 1) &&
-                (that.map[currentTile.x    ][currentTile.y + 3] !== 1) &&
-                (that.map[currentTile.x + 1][currentTile.y + 3] !== 1) &&
-                (that.map[currentTile.x - 1][currentTile.y + 2] !== 1) && (that.map[currentTile.x - 1][currentTile.y + 2] !== 2) &&
-                (that.map[currentTile.x    ][currentTile.y + 2] !== 1) && (that.map[currentTile.x    ][currentTile.y + 2] !== 2) &&
-                (that.map[currentTile.x + 1][currentTile.y + 2] !== 1) && (that.map[currentTile.x + 1][currentTile.y + 2] !== 2) &&
-                (that.map[currentTile.x - 1][currentTile.y + 1] !== 1) && (that.map[currentTile.x - 1][currentTile.y + 1] !== 2) &&
-                (that.map[currentTile.x    ][currentTile.y + 1] !== 1) && (that.map[currentTile.x    ][currentTile.y + 1] !== 2) &&
-                (that.map[currentTile.x + 1][currentTile.y + 1] !== 1) && (that.map[currentTile.x + 1][currentTile.y + 1] !== 2)
-            ) {
-                possibleDirections.push(directions[2]);
-            }
-            if (currentTile.x > 2 &&
-                (that.map[currentTile.x - 1][currentTile.y - 1] !== 1) && (that.map[currentTile.x - 1][currentTile.y - 1] !== 2) &&
-                (that.map[currentTile.x - 1][currentTile.y    ] !== 1) && (that.map[currentTile.x - 1][currentTile.y    ] !== 2) &&
-                (that.map[currentTile.x - 1][currentTile.y + 1] !== 1) && (that.map[currentTile.x - 1][currentTile.y + 1] !== 2) &&
-                (that.map[currentTile.x - 2][currentTile.y - 1] !== 1) && (that.map[currentTile.x - 2][currentTile.y - 1] !== 2) &&
-                (that.map[currentTile.x - 2][currentTile.y    ] !== 1) && (that.map[currentTile.x - 2][currentTile.y    ] !== 2) &&
-                (that.map[currentTile.x - 2][currentTile.y + 1] !== 1) && (that.map[currentTile.x - 2][currentTile.y + 1] !== 2) &&
-                (that.map[currentTile.x - 3][currentTile.y - 1] !== 1) &&
-                (that.map[currentTile.x - 3][currentTile.y    ] !== 1) &&
-                (that.map[currentTile.x - 3][currentTile.y + 1] !== 1)
-            ) {
-                possibleDirections.push(directions[3]);
+            var checkForBorders = [
+                (currentTile.y > 1),
+                (currentTile.x < that.width - 2),
+                (currentTile.y < that.height - 2),
+                (currentTile.x > 1)
+            ];
+
+            var isGivenDirectionPossible = [
+                true, true, true, true
+            ];
+
+            var borderValuesForTheLoops = [
+                {
+                    xMin : -1,
+                    xMax : 1,
+                    yMin : -2,
+                    yMax : -1
+                },
+                {
+                    xMin : 1,
+                    xMax : 2,
+                    yMin : -1,
+                    yMax : 1
+                },
+                {
+                    xMin : -1,
+                    xMax : 1,
+                    yMin : 1,
+                    yMax : 2
+                },
+                {
+                    xMin : -2,
+                    xMax : -1,
+                    yMin : -1,
+                    yMax : 1
+                }
+            ];
+
+            for (var i = 0; i < 4; i++) {
+                if (checkForBorders[i]) {
+                    for (var y = borderValuesForTheLoops[i].yMin; y <= borderValuesForTheLoops[i].yMax; y++) {
+                        for (var x = borderValuesForTheLoops[i].xMin; x <= borderValuesForTheLoops[i].xMax; x++) {
+                            isGivenDirectionPossible[i] = isGivenDirectionPossible[i] && (that.map[currentTile.x + x][currentTile.y + y] !== 1) && (that.map[currentTile.x + x][currentTile.y + y] !== 2);
+                        }
+                    }
+                    if (isGivenDirectionPossible[i]) {
+                        possibleDirections.push(directions[i]);
+                    }
+                }
             }
 
             if (possibleDirections.length === 0) {
@@ -176,15 +166,12 @@
                 }
             } else {
                 roadStack.push(currentTile);
-                direction = _.sample(possibleDirections);
+                if (possibleDirections.indexOf(direction) === -1 || Math.random() * 10 < randomFactor) {
+                    direction = _.sample(possibleDirections);
+                }
                 nextBlock = {
                     x : currentTile.x + direction.x,
                     y : currentTile.y + direction.y
-                };
-                that.map[nextBlock.x][nextBlock.y] = 1;
-                nextBlock = {
-                    x : nextBlock.x + direction.x,
-                    y : nextBlock.y + direction.y
                 };
                 that.map[nextBlock.x][nextBlock.y] = 1;
                 canPushMoreDeadEnds = true;
@@ -192,13 +179,13 @@
             if (nextBlock !== undefined) {
                 // canvas.fillStyle = '#575757';
                 // canvas.fillRect(nextBlock.x * that.blocksize, nextBlock.y * that.blocksize, that.blocksize, that.blocksize);
-                recGenerate(nextBlock, canPushMoreDeadEnds);
+                currentTile = nextBlock;
             }
         }
 
+
         that.map[start.x][start.y] = 1;
-        // that.deadends.push(start);
-        recGenerate(start, true);
+        that.deadends.push(start);
     };
     Labyrinth.prototype.generateDoors = function () {
         for (var i = 0; i < this.rooms.length; i++) {
@@ -299,43 +286,29 @@
         } while (depth > counter || (depth === undefined && newDeadEndCandidates.length > 0));
     };
     Labyrinth.prototype.draw = function () {
+        var colors = [
+            '#C7C7C7', // wall
+            '#FFFFFF', // road
+            '#F1F1F1', // room
+            '#FFC8AD', // door
+            '#FF0000'  // whatever else
+        ];
         for (var y = 0; y < this.height; y++) {
             for (var x = 0; x < this.width; x++) {
-                switch (this.map[x][y]) {
-                    case 0: // wall
-                        canvas.fillStyle = '#C7C7C7';
-                        canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
-                        break;
-                    case 1: // road
-                        canvas.fillStyle = '#FFFFFF';
-                        canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
-                        break;
-                    case 2: // room
-                        canvas.fillStyle = '#F1F1F1';
-                        canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
-                        break;
-                    case 3: // door
-                        canvas.fillStyle = '#FFC8AD';
-                        canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
-                        break;
-                    default: // whatever else
-                       canvas.fillStyle = '#FF0000';
-                       canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
-                       break;
-                }
-
+               canvas.fillStyle = colors[this.map[x][y]];
+               canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
             }
         }
     };
 
     var labyrinth = new Labyrinth(width, height, blocksize);
-    labyrinth.generateRooms(10, 6, 3, 6, 3); // roomAttempts, pRoomWidthMax, pRoomWidthMin, pRoomHeightMax, pRoomHeightMin
+    labyrinth.generateRooms(50, 10, 5, 10, 5); // roomAttempts, pRoomWidthMax, pRoomWidthMin, pRoomHeightMax, pRoomHeightMin
     labyrinth.generateLabyrinth({
         x : 1,
         y : 1
-    });
+    }, 4); // start position, random factor (0-9), 9 gives maximum random paths
     labyrinth.generateDoors();
-    // labyrinth.ereaseDeadEnds(); // param : depth of dead end ereasing; if not given, erease all
+    labyrinth.ereaseDeadEnds(); // param : depth of dead end ereasing; if not given, erease all
     labyrinth.draw();
 
-})(50, 50, 10);
+})(100, 100, 5);
