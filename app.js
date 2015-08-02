@@ -249,22 +249,15 @@
 
         }
     };
-    Labyrinth.prototype.drawDeadEnds = function () {
-        canvas.fillStyle = '#333333';
-        for (var i = 0; i < this.deadends.length; i++) {
-            canvas.fillRect(this.deadends[i].x * this.blocksize, this.deadends[i].y * this.blocksize, this.blocksize, this.blocksize);
-        }
-    };
     Labyrinth.prototype.ereaseDeadEnds = function (depth) {
-        var isDoorFound,
+        var blockNextToPotentialDeadEnd,
             isCurrentReallyDeadEnd,
-            newDeadEndCandidate,
-            blockNextToPotentialDeadEnd,
             newDeadEndCandidates,
+            newDeadEndCandidate,
             deleteThemNow,
-            counter;
-        // for (var d = 0; d < depth; d++) { // going trough the dead ends :depth: times
+            isDoorFound,
             counter = 0;
+
         do {
             newDeadEndCandidates = [];
             deleteThemNow        = [];
@@ -273,12 +266,12 @@
                 isDoorFound            = false;
                 isCurrentReallyDeadEnd = 0;
 
-
                 for (var j = 0; j < directions.length; j++) { // check if the block is actually a dead end: are there more than 2 path tiles in any direction?
                     blockNextToPotentialDeadEnd = {
                         x : this.deadends[i].x + directions[j].x,
                         y : this.deadends[i].y + directions[j].y
                     };
+
                     if (this.map[blockNextToPotentialDeadEnd.x][blockNextToPotentialDeadEnd.y] === 3) {
                         isDoorFound = true;
                     }
@@ -296,44 +289,41 @@
                         x : this.deadends[i].x,
                         y : this.deadends[i].y
                     });
-                    canvas.fillStyle = '#FF6B22';
-                    canvas.fillRect(this.deadends[i].x * this.blocksize, this.deadends[i].y * this.blocksize, this.blocksize, this.blocksize);
                 }
-
             }
-
-
             for (var k = 0; k < deleteThemNow.length; k++) {
                 this.map[deleteThemNow[k].x][deleteThemNow[k].y] = 0;
             }
             this.deadends = newDeadEndCandidates;
-
-            console.log(newDeadEndCandidates.length);
             counter++;
-        } while (depth > counter);// || newDeadEndCandidates.length !== 0
-
-        // }
+        } while (depth > counter || (depth === undefined && newDeadEndCandidates.length > 0));
     };
-
     Labyrinth.prototype.draw = function () {
         for (var y = 0; y < this.height; y++) {
             for (var x = 0; x < this.width; x++) {
-                if (this.map[x][y] === 0) { // wall
-                    canvas.fillStyle = '#C7C7C7';
-                    canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
+                switch (this.map[x][y]) {
+                    case 0: // wall
+                        canvas.fillStyle = '#C7C7C7';
+                        canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
+                        break;
+                    case 1: // road
+                        canvas.fillStyle = '#FFFFFF';
+                        canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
+                        break;
+                    case 2: // room
+                        canvas.fillStyle = '#F1F1F1';
+                        canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
+                        break;
+                    case 3: // door
+                        canvas.fillStyle = '#FFC8AD';
+                        canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
+                        break;
+                    default: // whatever else
+                       canvas.fillStyle = '#FF0000';
+                       canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
+                       break;
                 }
-                if (this.map[x][y] === 1) { // road
-                    canvas.fillStyle = '#FFFFFF';
-                    canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
-                }
-                if (this.map[x][y] === 2) { // room
-                    canvas.fillStyle = '#F1F1F1';
-                    canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
-                }
-                if (this.map[x][y] === 3) { // door
-                    canvas.fillStyle = '#FFC8AD';
-                    canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
-                }
+
             }
         }
     };
@@ -345,9 +335,7 @@
         y : 1
     });
     labyrinth.generateDoors();
-    labyrinth.drawDeadEnds();
-    // labyrinth.ereaseDeadEnds(3); // param : depth of dead end ereasing; if not given, erease all
+    // labyrinth.ereaseDeadEnds(); // param : depth of dead end ereasing; if not given, erease all
     labyrinth.draw();
-    // labyrinth.write();
 
 })(50, 50, 10);
