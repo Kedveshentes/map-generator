@@ -21,7 +21,6 @@
         }
     ];
 
-
     var Labyrinth = function (width, height, blocksize) {
         this.width     = width;
         this.height    = height;
@@ -50,7 +49,6 @@
             string = '';
         }
     };
-
     Labyrinth.prototype.generateRooms = function (roomAttempts) {
 		var room 		  = {},
 			that		  = this,
@@ -104,18 +102,33 @@
 			}
 		}
 	};
-
     Labyrinth.prototype.generateLabyrinth = function (start) {
         var roadStack  = [],
             that       = this;
 
         function recGenerate (currentTile, canPushMoreDeadEnds) {
-            var directions = [],
+            var possibleDirections = [],
                 direction;
 
             that.map[currentTile.x][currentTile.y] = 1;
             canvas.fillStyle = '#575757';
             canvas.fillRect(currentTile.x * that.blocksize, currentTile.y * that.blocksize, that.blocksize, that.blocksize);
+
+
+            // if (currentTile.y > 1) {
+            //     var isGoingUpPossible = true;
+            //     for (var y = -2; y < 0; y++) {
+            //         for (var x = -1; x < 2; x++) {
+            //             isGoingUpPossible = isGoingUpPossible && (that.map[currentTile.x + x][currentTile.y + y] !== 1) && (that.map[currentTile.x + x][currentTile.y + y] !== 2);
+            //         }
+            //     }
+            //     if (isGoingUpPossible) {
+            //         possibleDirections.push(directions[0]);
+            //     }
+            // }
+
+
+
 
             if (currentTile.y > 1 &&
                 (that.map[currentTile.x - 1][currentTile.y - 2] !== 1) && (that.map[currentTile.x - 1][currentTile.y - 2] !== 2) &&
@@ -125,11 +138,10 @@
                 (that.map[currentTile.x    ][currentTile.y - 1] !== 1) && (that.map[currentTile.x    ][currentTile.y - 1] !== 2) &&
                 (that.map[currentTile.x + 1][currentTile.y - 1] !== 1) && (that.map[currentTile.x + 1][currentTile.y - 1] !== 2)
             ) {
-                directions.push({
-                    x : currentTile.x,
-                    y : currentTile.y - 1
-                });
+                possibleDirections.push(directions[0]);
             }
+            // maximum call stack size exceeded
+
             if (currentTile.x < that.width - 2 &&
                 (that.map[currentTile.x + 1][currentTile.y - 1] !== 1) && (that.map[currentTile.x + 1][currentTile.y - 1] !== 2) &&
                 (that.map[currentTile.x + 1][currentTile.y    ] !== 1) && (that.map[currentTile.x + 1][currentTile.y    ] !== 2) &&
@@ -138,10 +150,7 @@
                 (that.map[currentTile.x + 2][currentTile.y    ] !== 1) && (that.map[currentTile.x + 2][currentTile.y    ] !== 2) &&
                 (that.map[currentTile.x + 2][currentTile.y + 1] !== 1) && (that.map[currentTile.x + 2][currentTile.y + 1] !== 2)
             ) {
-                directions.push({
-                    x : currentTile.x + 1,
-                    y : currentTile.y
-                });
+                possibleDirections.push(directions[1]);
             }
             if (currentTile.y < that.height - 2 &&
                 (that.map[currentTile.x - 1][currentTile.y + 2] !== 1) && (that.map[currentTile.x - 1][currentTile.y + 2] !== 2) &&
@@ -151,10 +160,7 @@
                 (that.map[currentTile.x    ][currentTile.y + 1] !== 1) && (that.map[currentTile.x    ][currentTile.y + 1] !== 2) &&
                 (that.map[currentTile.x + 1][currentTile.y + 1] !== 1) && (that.map[currentTile.x + 1][currentTile.y + 1] !== 2)
             ) {
-                directions.push({
-                    x : currentTile.x,
-                    y : currentTile.y + 1
-                });
+                possibleDirections.push(directions[2]);
             }
             if (currentTile.x > 1 &&
                 (that.map[currentTile.x - 1][currentTile.y - 1] !== 1) && (that.map[currentTile.x - 1][currentTile.y - 1] !== 2) &&
@@ -164,25 +170,26 @@
                 (that.map[currentTile.x - 2][currentTile.y    ] !== 1) && (that.map[currentTile.x - 2][currentTile.y    ] !== 2) &&
                 (that.map[currentTile.x - 2][currentTile.y + 1] !== 1) && (that.map[currentTile.x - 2][currentTile.y + 1] !== 2)
             ) {
-                directions.push({
-                    x : currentTile.x - 1,
-                    y : currentTile.y
-                });
+                possibleDirections.push(directions[3]);
             }
-
-            if (directions.length === 0) {
-                direction = roadStack.pop();
+            var nextBlock;
+            if (possibleDirections.length === 0) {
+                nextBlock = roadStack.pop();
                 if (canPushMoreDeadEnds === true) {
                     that.deadends.push(currentTile);
                     canPushMoreDeadEnds = false;
                 }
             } else {
                 roadStack.push(currentTile);
-                direction = _.sample(directions);
+                direction = _.sample(possibleDirections);
+                nextBlock = {
+                    x : currentTile.x + direction.x,
+                    y : currentTile.y + direction.y
+                };
                 canPushMoreDeadEnds = true;
             }
-            if (direction !== undefined) {
-                recGenerate(direction, canPushMoreDeadEnds);
+            if (nextBlock !== undefined) {
+                recGenerate(nextBlock, canPushMoreDeadEnds);
             }
         }
 
@@ -248,10 +255,10 @@
             isCurrentReallyDeadEnd,
             newDeadEndCandidate,
             blockNextToPotentialDeadEnd,
-            newDeadEndCanidates,
+            newDeadEndCandidates,
             deleteThemNow;
         for (var d = 0; d < depth; d++) { // going trough the dead ends :depth: times
-            newDeadEndCanidates = [];
+            newDeadEndCandidates = [];
             deleteThemNow       = [];
 
             for (var i = 0; i < this.deadends.length; i++) {
@@ -276,7 +283,7 @@
                     }
                 }
                 if (!isDoorFound && isCurrentReallyDeadEnd === 1) { // if there was more than 1 way from a dead end then it wasn't a dead end
-                    newDeadEndCanidates.push(newDeadEndCandidate);
+                    newDeadEndCandidates.push(newDeadEndCandidate);
                     deleteThemNow.push({
                         x : this.deadends[i].x,
                         y : this.deadends[i].y
@@ -291,7 +298,8 @@
             for (var k = 0; k < deleteThemNow.length; k++) {
                 this.map[deleteThemNow[k].x][deleteThemNow[k].y] = 0;
             }
-            this.deadends = newDeadEndCanidates;
+            console.log(newDeadEndCandidates.length);
+            this.deadends = newDeadEndCandidates;
         }
     };
 
