@@ -62,10 +62,12 @@
 		};
 
 		for (var i = 0; i < roomAttempts; i++) {
-			room.width  = Math.round(Math.random() * (roomWidthMax  - roomWidthMin))  + roomWidthMin;
-			room.height = Math.round(Math.random() * (roomHeightMax - roomHeightMin)) + roomHeightMin;
-			room.x      = Math.round(Math.random() * (that.width - room.width - 6) + 3);
-			room.y      = Math.round(Math.random() * (that.height - room.height - 6) + 3);
+			room.width  = Math.round((Math.round(Math.random() * (roomWidthMax  - roomWidthMin))  + roomWidthMin) / 2) * 2 + 1;
+			room.height = Math.round((Math.round(Math.random() * (roomHeightMax - roomHeightMin)) + roomHeightMin) / 2) * 2 + 1;
+			room.x      = Math.round((Math.round(Math.random() * (that.width - room.width - 6) + 3)) / 2) * 2 + 1;
+			room.y      = Math.round((Math.round(Math.random() * (that.height - room.height - 6) + 3)) / 2) * 2 + 1;
+            // random generating a number in an interval, rounding it, divided by two and rounded so it's guaranteed even,
+            // multiplied by two, and add 1 to make it odd but around the original size
 
 			if (checkRoomCollision(room) === false) {
 				that.rooms.push({
@@ -80,34 +82,36 @@
 						that.map[x][y] = 2;
 					}
 				}
-
-				canvas.fillStyle = 'rgb(' + Math.round(Math.random() * 100) + ', ' + Math.round(Math.random() * 100) + ', ' + Math.round(Math.random() * 100) + ')';
-				canvas.fillRect(
-					room.x * that.blocksize,
-					room.y * that.blocksize,
-					room.width * that.blocksize,
-					room.height * that.blocksize
-				);
 			}
 		}
 	};
-    Labyrinth.prototype.generateLabyrinth = function (start, randomFactor) {
-        var roadStack  = [],
-            that       = this;
+    Labyrinth.prototype.generateLabyrinth = function (currentTile, randomFactor) {
+        var roadStack           = [],
+            that                = this,
+            canPushMoreDeadEnds = true,
+            possibleDirections,
+            nextBlock,
+            direction;
 
-        var currentTile = start;
+        var checkLabyrinthFill = function () {
+            for (var y = 1; y < that.height - 1; y += 2) {
+                for (var x = 1; x < that.width - 1; x += 2) {
+                    if (that.map[x][y] === 0) {
+                        return {
+                            x : x,
+                            y : y
+                        };
+                    }
+                }
+            }
+            return false;
+        };
 
-        roadStack.push(currentTile);
+        var floodFill = function (currentTile) {
+            roadStack.push(currentTile);
+            that.deadends.push(currentTile);
+            that.map[currentTile.x][currentTile.y] = 1;
 
-        var possibleDirections;
-        var nextBlock;
-        var direction;
-        var canPushMoreDeadEnds = true;
-
-        that.map[start.x][start.y] = 1;
-        that.deadends.push(start);
-
-        var floodFill = function () {
             while (roadStack.length > 0) {
                 possibleDirections = [];
                 that.map[currentTile.x][currentTile.y] = 1;
@@ -123,49 +127,6 @@
                     true, true, true, true
                 ];
 
-                var borderValuesForTheLoops = [
-                    {
-                        xMin : -1,
-                        xMax : 1,
-                        yMin : -2,
-                        yMax : -1
-                    },
-                    {
-                        xMin : 1,
-                        xMax : 2,
-                        yMin : -1,
-                        yMax : 1
-                    },
-                    {
-                        xMin : -1,
-                        xMax : 1,
-                        yMin : 1,
-                        yMax : 2
-                    },
-                    {
-                        xMin : -2,
-                        xMax : -1,
-                        yMin : -1,
-                        yMax : 1
-                    }
-                ];
-
-                // for 1 step maze
-                // for (var i = 0; i < 4; i++) {
-                //     if (checkForBorders[i]) {
-                //         for (var y = borderValuesForTheLoops[i].yMin; y <= borderValuesForTheLoops[i].yMax; y++) {
-                //             for (var x = borderValuesForTheLoops[i].xMin; x <= borderValuesForTheLoops[i].xMax; x++) {
-                //                 isGivenDirectionPossible[i] = isGivenDirectionPossible[i] && (that.map[currentTile.x + x][currentTile.y + y] !== 1) && (that.map[currentTile.x + x][currentTile.y + y] !== 2);
-                //             }
-                //         }
-                //         if (isGivenDirectionPossible[i]) {
-                //             possibleDirections.push(directions[i]);
-                //         }
-                //     }
-                // }
-                // for 1 step maze/
-                // ||||||||||||||||||||||||||||||||||||||||||||||||
-                // for 2 step maze
                 for (var i = 0; i < 4; i++) {
                     if (checkForBorders[i]) {
                         isGivenDirectionPossible[i] = isGivenDirectionPossible[i] && (that.map[currentTile.x + directions[i].x * 2][currentTile.y + directions[i].y * 2] !== 1) && (that.map[currentTile.x + directions[i].x * 2][currentTile.y + directions[i].y * 2] !== 2);
@@ -198,13 +159,17 @@
                     canPushMoreDeadEnds = true;
                 }
                 if (nextBlock !== undefined) {
-                    // canvas.fillStyle = '#575757';
-                    // canvas.fillRect(nextBlock.x * that.blocksize, nextBlock.y * that.blocksize, that.blocksize, that.blocksize);
+                    canvas.fillStyle = '#575757';
+                    canvas.fillRect(nextBlock.x * that.blocksize, nextBlock.y * that.blocksize, that.blocksize, that.blocksize);
                     currentTile = nextBlock;
                 }
             }
         };
-        floodFill();
+
+        do {
+            floodFill(currentTile);
+            currentTile = checkLabyrinthFill();
+        } while (currentTile !== false);
     };
     Labyrinth.prototype.generateDoors = function () {
         for (var i = 0; i < this.rooms.length; i++) {
@@ -321,13 +286,13 @@
     };
 
     var labyrinth = new Labyrinth(width, height, blocksize, step);
-    labyrinth.generateRooms(50, 10, 5, 10, 5); // roomAttempts, pRoomWidthMax, pRoomWidthMin, pRoomHeightMax, pRoomHeightMin
+    labyrinth.generateRooms(50, 11, 5, 11, 5); // roomAttempts, pRoomWidthMax, pRoomWidthMin, pRoomHeightMax, pRoomHeightMin
     labyrinth.generateLabyrinth({
         x : 1,
         y : 1
     }, 4); // start position, random factor (0-9), 9 gives maximum random paths
     labyrinth.generateDoors();
-    // labyrinth.ereaseDeadEnds(); // param : depth of dead end ereasing; if not given, erease all
+    //  labyrinth.ereaseDeadEnds(); // param : depth of dead end ereasing; if not given, erease all
     labyrinth.draw();
 
 })(100, 100, 5, 1);
