@@ -88,6 +88,12 @@
     "wsh"           : false,    // Windows Scripting Host
     "yui"           : false,    // Yahoo User Interface
 
-    // Custom Globals
-    "globals"       : {"_" : false}        //// additional predefined global variables
 }
+
+/*
+    // Custom Globals         //// additional predefined global variables
+    "globals"       : {
+        "_"    : false,
+        "vec2" : false
+    }
+*/
