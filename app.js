@@ -1,4 +1,4 @@
-(function (width, height, blocksize, step) {
+(function (width, height, size, step, randomness) {
     'use strict';
     var c          = document.getElementById('canvas'),
         canvas     = c.getContext('2d'),
@@ -31,7 +31,7 @@
             }
         },
         util = {
-            degToRad       : function (degrees) {
+            degToRad : function (degrees) {
     			return degrees * Math.PI / 180;
     		},
             rotationMatrix : function (degrees) {
@@ -41,19 +41,39 @@
                     - Math.sin(this.degToRad(degrees)).toFixed(), // should be +
                       Math.cos(this.degToRad(degrees)).toFixed()
                 ];
+            },
+            containsObject : function (list, object) {
+                for (var i = 0; i < list.length; i++) {
+                    if (_.isEqual(list[i], object)) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+            turn : function (vector, direction) {
+                switch (direction) {
+                    case 'left':
+                        vec2.transformMat2(vector, vector, util.rotationMatrix(-90));
+                        break;
+                    case 'right':
+                        vec2.transformMat2(vector, vector, util.rotationMatrix(90));
+                        break;
+                    case 'back':
+                        vec2.transformMat2(vector, vector, util.rotationMatrix(180));
+                        break;
+                    default:
+                        console.log('invalid switch direction');
+                }
             }
         };
-
 
         // var vectorUp = [0, -1];
         // vec2.transformMat2(vectorUp, vectorUp, util.rotationMatrix(90));
 
-
-
-    var Labyrinth = function (width, height, blocksize, step) {
-        this.width     = width;
-        this.height    = height;
-        this.blocksize = blocksize;
+    var Labyrinth = function (width, height, size, step) {
+        this.width     = width * 2 + 1;
+        this.height    = height * 2 + 1;
+        this.size      = size;
         this.step      = step;
         this.map       = [];
         this.rooms     = [];
@@ -61,11 +81,6 @@
         this.waypoints = [];
 
         this.init();
-    };
-
-    Labyrinth.prototype.drawBlock = function (x, y, color) {
-        canvas.fillStyle = color;
-        canvas.fillRect(x * this.blocksize, y * this.blocksize, this.blocksize, this.blocksize);
     };
     Labyrinth.prototype.init = function () {
         for (var i = 0; i < this.height; i++) {
@@ -118,10 +133,10 @@
 
 			if (checkRoomCollision(room) === false) {
 				that.rooms.push({
-					width : room.width,
+					width  : room.width,
 					height : room.height,
-					x : room.x,
-					y : room.y
+					x      : room.x,
+					y      : room.y
 				});
 
 				for (var x = room.x; x < room.x + room.width; x++) {
@@ -140,50 +155,50 @@
             nextBlock,
             direction;
 
-            var checkLabyrinthFill = function () {
-                for (var y = 1; y < that.height - 1; y += 2) {
-                    for (var x = 1; x < that.width - 1; x += 2) {
-                        if (that.map[x][y] === 0) {
-                            return {
-                                x : x,
-                                y : y
-                            };
-                        }
+        var checkLabyrinthFill = function () {
+            for (var y = 1; y < that.height - 1; y += 2) {
+                for (var x = 1; x < that.width - 1; x += 2) {
+                    if (that.map[x][y] === 0) {
+                        return {
+                            x : x,
+                            y : y
+                        };
                     }
                 }
-                return false;
-            };
+            }
+            return false;
+        };
 
-            var addWaypoints = function () {
-                var isThereWayInPrevDirection = false;
-                for (var y = 1; y < that.height - 1; y += 2) {
-                    for (var x = 1; x < that.width - 1; x += 2) {
-                        canvas.fillStyle = '#262FFF';
-                        canvas.fillRect(x * that.blocksize, y * that.blocksize, that.blocksize, that.blocksize);
-                        for (var i = 0; i < 4; i++) {
-                            if (that.map[x + directions[i].x][y + directions[i].y] !== 0) {
-                                if (isThereWayInPrevDirection === true) {
-                                    that.waypoints.push({
-                                        x : x,
-                                        y : y
-                                    });
-                                    canvas.fillStyle = '#F53535';
-                                    canvas.fillRect(x * that.blocksize, y * that.blocksize, that.blocksize, that.blocksize);
-                                    that.map[x][y] = 4;
-                                    isThereWayInPrevDirection = false;
-                                    break;
-                                } else {
-                                    isThereWayInPrevDirection = true;
-                                }
-                            } else {
+        var addWaypoints = function () {
+            var isThereWayInPrevDirection = false;
+            for (var y = 1; y < that.height - 1; y += 2) {
+                for (var x = 1; x < that.width - 1; x += 2) {
+                    canvas.fillStyle = '#262FFF';
+                    canvas.fillRect(x * that.size, y * that.size, that.size, that.size);
+                    for (var i = 0; i < 4; i++) {
+                        if (that.map[x + directions[i].x][y + directions[i].y] !== 0) {
+                            if (isThereWayInPrevDirection === true) {
+                                that.waypoints.push({
+                                    x : x,
+                                    y : y
+                                });
+                                canvas.fillStyle = '#F53535';
+                                canvas.fillRect(x * that.size, y * that.size, that.size, that.size);
+                                that.map[x][y] = 4;
                                 isThereWayInPrevDirection = false;
+                                break;
+                            } else {
+                                isThereWayInPrevDirection = true;
                             }
+                        } else {
+                            isThereWayInPrevDirection = false;
                         }
-                        isThereWayInPrevDirection = false;
                     }
+                    isThereWayInPrevDirection = false;
                 }
-                return false;
-            };
+            }
+            return false;
+        };
 
         var floodFill = function (currentTile) {
             roadStack.push(currentTile);
@@ -205,13 +220,20 @@
                     true, true, true, true
                 ];
 
+                var directionVector = [0, -1];
                 for (var i = 0; i < 4; i++) {
                     if (checkForBorders[i]) {
-                        isGivenDirectionPossible[i] = isGivenDirectionPossible[i] && (that.map[currentTile.x + directions[i].x * 2][currentTile.y + directions[i].y * 2] !== 1) && (that.map[currentTile.x + directions[i].x * 2][currentTile.y + directions[i].y * 2] !== 2);
+                        var first = currentTile.x + directionVector[0] * 2;
+                        var second = currentTile.y + directionVector[1] * 2;
+                        isGivenDirectionPossible[i] = isGivenDirectionPossible[i] && tileTypes[that.map[first][second]].isSolid;
                         if (isGivenDirectionPossible[i]) {
-                            possibleDirections.push(directions[i]);
+                            possibleDirections.push({
+                                x : directionVector[0],
+                                y : directionVector[1]
+                            });
                         }
                     }
+                    util.turn(directionVector, 'right');
                 }
 
                 if (possibleDirections.length === 0) {
@@ -222,7 +244,11 @@
                     }
                 } else {
                     roadStack.push(currentTile);
-                    if (possibleDirections.indexOf(direction) === -1 || Math.random() * 10 < randomFactor) {
+
+                    var isPreviousDirectionPossible = util.containsObject(possibleDirections, direction);
+                    var isPreviousDirectionOverridden = Math.random() * 10 < randomFactor;
+
+                    if (isPreviousDirectionPossible || isPreviousDirectionOverridden) {
                         direction = _.sample(possibleDirections);
                     }
                     nextBlock = {
@@ -235,7 +261,6 @@
 
                     canPushMoreDeadEnds = true;
                 }
-
                 currentTile = nextBlock;
             }
         };
@@ -248,62 +273,56 @@
         // addWaypoints();
     };
     Labyrinth.prototype.generateDoors = function () {
-        var direction    = [0, -1],
-            checkOnLeft  = [],
+        var direction    = [ 1,  0],
+            checkOnLeft  = [ 0, -1],
+            checkOnRight = [ 0,  1],
             position,
-            roomWidthOrHeight;
+            roomWidthOrHeight = 'width';
 
         for (var i = 0; i < this.rooms.length; i++) {
             this.rooms[i].thinWalls = [];
             this.rooms[i].doors     = [];
 
-            position = [0, 0];
+            position = [this.rooms[i].x, this.rooms[i].y];
 
-            for (var side = 0; side < 4; side++) {
-                vec2.transformMat2(direction, direction, util.rotationMatrix(90));
-                vec2.transformMat2(checkOnLeft, direction, util.rotationMatrix(90));
-
-                if (direction[0] !== 0) {
-                    roomWidthOrHeight = this.rooms[i].width;
+            for (var d = 0; d < 4; d++) {
+                if (
+                    (roomWidthOrHeight === 'height' && (position[0] > 1 && position[0] < this.width  - 3)) ||
+                    (roomWidthOrHeight === 'width'  && (position[1] > 1 && position[1] < this.height - 3))
+                ) {
+                    for (var j = 0; j < this.rooms[i][roomWidthOrHeight]; j++) {
+                        var checkThisBlock = [position[0] + 2 * checkOnLeft[0], position[1] + 2 * checkOnLeft[1]];
+                        // console.log(checkThisBlock[0] + ' ' + checkThisBlock[1]);
+                        // this.drawBlock(checkThisBlock[0], checkThisBlock[1], '#DD2332');
+                        if (!tileTypes[this.map[checkThisBlock[0]][checkThisBlock[1]]].isSolid) {
+                            this.rooms[i].thinWalls.push({
+                                x : position[0] + checkOnLeft[0],
+                                y : position[1] + checkOnLeft[1]
+                            });
+                        }
+                        position[0] = position[0] + direction[0];
+                        position[1] = position[1] + direction[1];
+                    }
                 } else {
-                    roomWidthOrHeight = this.rooms[i].height;
+                    var steps = (roomWidthOrHeight === 'height' ? this.rooms[i].height : this.rooms[i].width);
+                    position[0] = position[0] + direction[0] * steps;
+                    position[1] = position[1] + direction[1] * steps;
+                    // this.drawBlock(position[0], position[1], '#2332EE');
                 }
+                // step back a bit, because we moved trough the wall
+                position[0] = position[0] - direction[0];
+                position[1] = position[1] - direction[1];
+                roomWidthOrHeight = (roomWidthOrHeight === 'width' ? 'height' : 'width');
 
-                var edgeOfRoomCoords;
-                var roomWallCoords;
-                var beyondTHEWALLCoords;
-                var edgeOfRoom;
-                var roomWall;
-                var beyondTHEWALL;
-
-
-                for (var r = 0; r < roomWidthOrHeight; r++) {
-                    edgeOfRoomCoords    = [this.rooms[i].x + position[0]                     , this.rooms[i].y + position[1]                     ];
-                    if (edgeOfRoomCoords[0] === 1 || edgeOfRoomCoords[0] === 49 || edgeOfRoomCoords[1] === 1 || edgeOfRoomCoords[1] === 49) {
-                        break;
-                    }
-                    roomWallCoords      = [this.rooms[i].x + position[0] - checkOnLeft[0]    , this.rooms[i].y + position[1] - checkOnLeft[1]    ];
-                    beyondTHEWALLCoords = [this.rooms[i].x + position[0] - checkOnLeft[0] * 2, this.rooms[i].y + position[1] - checkOnLeft[1] * 2];
-                    edgeOfRoom    = this.map[edgeOfRoomCoords   [0]][edgeOfRoomCoords   [1]];
-                    roomWall      = this.map[roomWallCoords     [0]][roomWallCoords     [1]];
-                    beyondTHEWALL = this.map[beyondTHEWALLCoords[0]][beyondTHEWALLCoords[1]];
-
-                    if (tileTypes[roomWall].isSolid && beyondTHEWALL !== undefined && !tileTypes[beyondTHEWALL].isSolid) {
-                        this.rooms[i].thinWalls.push({
-                            x : roomWallCoords[0],
-                            y : roomWallCoords[1]
-                        });
-                    }
-                    vec2.add(position, position, direction);                                                                        // this.drawBlock(edgeOfRoomCoords[0], edgeOfRoomCoords[1], '#74E956');// this.drawBlock(roomWallCoords[0], roomWallCoords[1], '#DEE956');// this.drawBlock(beyondTHEWALLCoords[0], beyondTHEWALLCoords[1], '#E96856');
-                }
-                vec2.subtract(position, position, direction);                                                                       // this.drawBlock(this.rooms[i].x + position[0], this.rooms[i].y + position[1], '#9D7FC4');// this.drawBlock(this.rooms[i].x + position[0], this.rooms[i].y + position[1], '#341E1A');
+                util.turn(direction,    'right');
+                util.turn(checkOnLeft,  'right');
+                util.turn(checkOnRight, 'right');
             }
 
             this.rooms[i].doors = _.sample(this.rooms[i].thinWalls, Math.round(Math.random() * 2) + 1);
             for (var j = 0; j < this.rooms[i].doors.length; j++) {
-                this.map[this.rooms[i].doors[j].x][this.rooms[i].doors[j].y] = 3;                                                   // this.drawBlock(this.rooms[i].doors[j].x, this.rooms[i].doors[j].y, '#217724');
+                this.map[this.rooms[i].doors[j].x][this.rooms[i].doors[j].y] = 3;
             }
-
         }
     };
     Labyrinth.prototype.ereaseDeadEnds = function (depth) {
@@ -358,6 +377,10 @@
             counter++;
         } while (depth > counter || (depth === undefined && newDeadEndCandidates.length > 0));
     };
+    Labyrinth.prototype.drawBlock = function (x, y, color) {
+        canvas.fillStyle = color;
+        canvas.fillRect(x * this.size, y * this.size, this.size, this.size);
+    };
     Labyrinth.prototype.draw = function () {
         for (var y = 0; y < this.height; y++) {
             for (var x = 0; x < this.width; x++) {
@@ -370,15 +393,27 @@
 
 
 
-    var labyrinth = new Labyrinth (width, height, blocksize, step);
-    labyrinth.generateRooms(50, 11, 5, 11, 5); // roomAttempts, pRoomWidthMax, pRoomWidthMin, pRoomHeightMax, pRoomHeightMin
+
+
+
+
+
+
+    var labyrinth = new Labyrinth (width, height, size, step);
+    labyrinth.generateRooms(100, 7, 1, 7, 1); // roomAttempts, pRoomWidthMax, pRoomWidthMin, pRoomHeightMax, pRoomHeightMin
     labyrinth.generateLabyrinth({
         x : 1,
         y : 1
-    }, 6); // start position, random factor (0-9, 9 gives maximum random paths)
-    labyrinth.draw();
+    }, randomness);
     labyrinth.generateDoors();
+    // labyrinth.write();
     labyrinth.ereaseDeadEnds(); // param : depth of dead end ereasing; if not given, erease all
     labyrinth.draw();
 
-})(51, 51, 5, 1);
+})(
+    25, // width
+    25, // height
+    5,  // size
+    1,  // step
+    5   // randomness, random factor (0-9, 9 gives maximum random paths)
+);
