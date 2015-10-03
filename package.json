@@ -1,0 +1,25 @@
+{
+    "name"         : "map-generator",
+    "version"      : "0.1.0",
+    "description"  : "JS random dungeon map generator",
+    "author"       : "Robert Kardos",
+    "email"        : "kardos.robert.kh@gmail.com",
+    "repository"   : {
+        "type" : "git",
+        "url"  : "https://github.com/Kedveshentes/map-generator"
+    },
+    "keywords"     : [
+        "random",
+        "map",
+        "dungeon",
+        "combobreaker",
+        "generator"
+    ],
+    "dependencies" : {
+        "gl-matrix"  : "^2.3.0",
+        "require"    : "^0.5.0",
+        "underscore" : "*",
+        "three"      : "*"
+    },
+    "license"      : "MIT"
+}
