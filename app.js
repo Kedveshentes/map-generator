@@ -10,24 +10,49 @@
         ],
         tileTypes  = {
             0 : {                        // wall
-                isSolid : true,
-                color   : '#C7C7C7'
+                isSolid  : true,
+                color    : '#C7C7C7',
+                material : function () {
+                    return new THREE.MeshLambertMaterial({
+                        color : 0xC7C7C7
+                    });
+                }
             },
             1 : {                        // road
-                isSolid : false,
-                color   : '#FFFFFF'
+                isSolid  : false,
+                color    : '#FFFFFF',
+                material : function () {
+                    return new THREE.MeshLambertMaterial({
+                        color : 0xFFFFFF
+                    });
+                }
             },
             2 : {                        // room
-                isSolid : false,
-                color   : '#F1F1F1'
+                isSolid  : false,
+                color    : '#F1F1F1',
+                material : function () {
+                    return new THREE.MeshLambertMaterial({
+                        color : 0xF1F1F1
+                    });
+                }
             },
             3 : {                        // door
-                isSolid : false,
-                color   : '#FFC8AD'
+                isSolid  : false,
+                color    : '#FFC8AD',
+                material : function () {
+                    return new THREE.MeshLambertMaterial({
+                        color : 0xFFC8AD
+                    });
+                }
             },
             4 : {                        // waypoints
-                isSolid : false,
-                color   : '#FF0000'
+                isSolid  : false,
+                color    : '#FF0000',
+                material : function () {
+                    return new THREE.MeshLambertMaterial({
+                        color : 0xFF0000
+                    });
+                }
             }
         },
         util = {
@@ -382,11 +407,83 @@
         canvas.fillRect(x * this.size, y * this.size, this.size, this.size);
     };
     Labyrinth.prototype.draw = function () {
+        var canvas = {
+            width  : 900,
+            height : 900,
+        }
+
+        var scene = new THREE.Scene();
+
+		var camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
+            camera.position.x = this.width  / 2;
+            camera.position.y = this.height / 2;
+            camera.position.z = 50;
+
+		var renderer = new THREE.WebGLRenderer();
+    		renderer.setSize(canvas.width, canvas.height);
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMapSoft = true;
+
+            // renderer.shadowCameraNear = 3;
+            // renderer.shadowCameraFar = camera.far;
+            // renderer.shadowCameraFov = 50;
+
+		document.body.appendChild(renderer.domElement);
+
+        var geometry = new THREE.BoxGeometry(1, 1, 1);
+
+        var light = new THREE.AmbientLight(0x404040);
+        scene.add(light);
+
+        var spotLight = new THREE.SpotLight(0xadadad);
+            spotLight.position.set(this.width  / 1.5, this.height / 1.5, 30);
+            spotLight.castShadow = true;
+
+            spotLight.shadowMapWidth  = 1024;
+            spotLight.shadowMapHeight = 1024;
+
+            spotLight.shadowCameraVisible = true;
+            spotLight.shadowCameraNear    = 5;
+            spotLight.shadowCameraFar     = 200;
+            spotLight.shadowCameraFov     = 120;
+
+        scene.add(spotLight);
+
+        var map3d = [];
+
+        function cubeFactory (cubeType) {
+            return tileTypes[cubeType].material();
+        }
+
         for (var y = 0; y < this.height; y++) {
+            map3d[y] = [];
             for (var x = 0; x < this.width; x++) {
-                this.drawBlock(x, y, tileTypes[this.map[x][y]].color);
+                var cube = new THREE.Mesh(geometry, cubeFactory(this.map[x][y]));
+                cube.position.x = x;
+                cube.position.y = y;
+                if (tileTypes[this.map[x][y]].isSolid) {
+                    cube.position.z = 1;
+                    cube.castShadow    = true;
+                } else {
+            		cube.receiveShadow = true;
+                }
+                scene.add(cube);
+                map3d[y][x] = cube;
             }
         }
+
+
+        spotLight.target = map3d[20][20];
+
+        var render = function () {
+			requestAnimationFrame(render);
+			// cube.rotation.x += 0.1;
+			// cube.rotation.y += 0.1;
+			renderer.render(scene, camera);
+		};
+
+		render();
     };
 
 
@@ -411,8 +508,8 @@
     labyrinth.draw();
 
 })(
-    25, // width
-    25, // height
+    20, // width
+    20, // height
     5,  // size
     1,  // step
     5   // randomness, random factor (0-9, 9 gives maximum random paths)
