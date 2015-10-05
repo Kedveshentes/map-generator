@@ -60,4 +60,4 @@ http.createServer(function (request, response) {
     var absPath = './' + filePath;
 
     serverWorking(response, absPath);
-}).listen(3000);
+}).listen(process.env.PORT || 3000);
