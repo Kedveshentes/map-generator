@@ -20,17 +20,19 @@ function (THREE, util) {
     player.position.z = 1 * step;
     scene.add(player);
 
-	var camera = new THREE.PerspectiveCamera(90, canvas.width / canvas.height, 0.1, 1000);
+	var camera = new THREE.PerspectiveCamera(90, canvas.width / canvas.height, 0.1, 100);
+    camera.position.x = 10 * step;
+    camera.position.y = 10 * step;
+    camera.position.z = 20 * step;
         // camera.lookAt(player.position);
-	var renderer = new THREE.WebGLRenderer({
-            antialiasing : true
-        });
+	var renderer = new THREE.WebGLRenderer();
 		renderer.setSize(canvas.width, canvas.height);
-        renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMapSoft     = true;
+        // renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+        // renderer.shadowMap.enabled = true;
+        // renderer.shadowMapSoft     = true;
 
     var light = new THREE.AmbientLight(0x0a0a0a);
+    // var light = new THREE.AmbientLight(0xffffff);
         scene.add(light);
 
     var spotLight = new THREE.SpotLight(0xadadad);
@@ -46,6 +48,12 @@ function (THREE, util) {
 
     var geometry = new THREE.BoxGeometry(1 * step, 1 * step, 1 * step);
 
+
+    var cubeFactory = function (cubeType) {
+        return new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
+            color : util.tileTypes[cubeType].color
+        }));
+    }
     var handleKeyUp = function (event) {
         pressedKeys[event.keyCode] = false;
     };
@@ -80,33 +88,40 @@ function (THREE, util) {
         handleKeys();
     }
 
-    var render = function () {
-		requestAnimationFrame(render);
-        update();
-
-        console.log('asd');
+    var rendering = function () {
 		renderer.render(scene, camera);
 	};
 
-    var cubeFactory = function (cubeType) {
-        return new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
-            color : util.tileTypes[cubeType].color
-        }));
-    }
 
+
+    var that        = this,
+		dt          = 0,
+		now,
+		asdstep     = 1/60,
+		last        = util. timestamp();
+
+	var frame = function () {
+		// that.utils.fpsmeter.tickStart();
+		now  = util.timestamp();
+		dt   = dt + Math.min(1, (now - last) / 1000);
+		while (dt > asdstep) {
+			dt = dt - asdstep;
+			update(asdstep);
+			console.log('asd');
+		}
+		rendering(dt);
+		last = now;
+		requestAnimationFrame(frame);
+	};
     var init = function () {
-
-        document.onkeyup   = handleKeyUp;
-        document.onkeydown = handleKeyDown;
-
-    	render();
-
+    	// render();
+        frame();
         return {
             draw : function (map, width, height) {
-                camera.position.x = Math.floor(width / 2 * step);
-                camera.position.y = 10 * step;
-                camera.position.z = 20 * step;
-                camera.lookAt(new THREE.Vector3(Math.floor(width / 2 * step), Math.floor(height / 2 * step), 0));
+                // camera.position.x = Math.floor(width / 2 * step);
+                // camera.position.y = 10 * step;
+                // camera.position.z = 20 * step;
+                // camera.lookAt(new THREE.Vector3(Math.floor(width / 2 * step), Math.floor(height / 2 * step), 0));
 
                 spotLight.position.set(-30, height / 1.5, 60 * step);
 
@@ -131,7 +146,8 @@ function (THREE, util) {
             }
         };
     }
-
+    document.onkeyup     = handleKeyUp;
+    document.onkeydown   = handleKeyDown;
     document.body.appendChild(renderer.domElement);
 
     return {

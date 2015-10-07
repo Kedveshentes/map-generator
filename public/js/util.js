@@ -1,6 +1,9 @@
 define(['glMatrix'],
 function (glMatrix) {
     return {
+        timestamp : function () {
+            return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
+        },
         tileTypes : {
             0 : {                        // wall
                 isSolid : true,

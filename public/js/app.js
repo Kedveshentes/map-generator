@@ -37,9 +37,9 @@ function (Labyrinth, Game) {
 
     window.main = function () {
         window.requestAnimationFrame( main );
-        console.log('asd');
+        // console.log('asd');
       // Whatever your main loop needs to do.
     };
-    // main();
-    
+    main();
+
 });
