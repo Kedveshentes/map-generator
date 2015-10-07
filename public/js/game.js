@@ -10,7 +10,18 @@ function (THREE, util) {
         };
     var step = 5;
     var scene = new THREE.Scene();
+
+    var playerGeometry = new THREE.BoxGeometry(0.6 * step, 0.6 * step, 0.6 * step);
+    var player = new THREE.Mesh(playerGeometry, new THREE.MeshLambertMaterial({
+        color : 0xAAAAFF
+    }));
+    player.position.x = 10 * step;
+    player.position.y = 10 * step;
+    player.position.z = 1 * step;
+    scene.add(player);
+
 	var camera = new THREE.PerspectiveCamera(90, canvas.width / canvas.height, 0.1, 1000);
+        // camera.lookAt(player.position);
 	var renderer = new THREE.WebGLRenderer({
             antialiasing : true
         });
@@ -33,13 +44,6 @@ function (THREE, util) {
         spotLight.shadowCameraFov  = 120;
         scene.add(spotLight);
 
-    var playerGeometry = new THREE.BoxGeometry(0.6 * step, 0.6 * step, 0.6 * step);
-    var player = new THREE.Mesh(playerGeometry, new THREE.MeshLambertMaterial({
-        color : 0xAAAAFF
-    }));
-    player.position.z = 1 * step;
-    scene.add(player);
-
     var geometry = new THREE.BoxGeometry(1 * step, 1 * step, 1 * step);
 
     var handleKeyUp = function (event) {
@@ -52,22 +56,22 @@ function (THREE, util) {
     var handleKeys = function () {
         if (pressedKeys[37]) {
             // Left cursor key
-            player.position.x += -0.2;
+            player.position.x -= 1;
             console.log('37');
         }
         if (pressedKeys[39]) {
             // Right cursor key
-            player.position.x -= -0.2;
+            player.position.x += 1;
             console.log('39');
         }
         if (pressedKeys[38]) {
             // Up cursor key
-            player.position.y -= -0.2;
+            player.position.y += 1;
             console.log('38');
         }
         if (pressedKeys[40]) {
             // Down cursor key
-            player.position.y += -0.2;
+            player.position.y -= 1;
             console.log('40');
         }
     };
@@ -76,21 +80,13 @@ function (THREE, util) {
         handleKeys();
     }
 
-    // var render = function () {
-	// 	requestAnimationFrame(render);
-    //     update();
-	// 	renderer.render(scene, camera);
-	// };
-
-    function mainLoop () {
+    var render = function () {
+		requestAnimationFrame(render);
         update();
-        renderer.render(scene, camera);
-        requestAnimationFrame(mainLoop);
-    }
 
-    // Start things off
-    requestAnimationFrame(mainLoop);
-
+        console.log('asd');
+		renderer.render(scene, camera);
+	};
 
     var cubeFactory = function (cubeType) {
         return new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
@@ -99,10 +95,11 @@ function (THREE, util) {
     }
 
     var init = function () {
+
         document.onkeyup   = handleKeyUp;
         document.onkeydown = handleKeyDown;
 
-    	// render();
+    	render();
 
         return {
             draw : function (map, width, height) {

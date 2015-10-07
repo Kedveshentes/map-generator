@@ -34,4 +34,12 @@ function (Labyrinth, Game) {
     var labyrinth = new Labyrinth(labyrinthConfig);
     var game = Game.getGameInstance();
     game.draw(labyrinth.map, labyrinth.width, labyrinth.height);
+
+    window.main = function () {
+        window.requestAnimationFrame( main );
+        console.log('asd');
+      // Whatever your main loop needs to do.
+    };
+    // main();
+    
 });
