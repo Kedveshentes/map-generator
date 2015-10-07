@@ -1,5 +1,5 @@
-define(['three', 'glMatrix', 'underscore'],
-function (THREE, glMatrix, _) {
+define(['three', 'underscore', 'util'],
+function (THREE, _, util) {
     'use strict';
 
     var c          = document.getElementById('canvas'),
@@ -9,85 +9,7 @@ function (THREE, glMatrix, _) {
             {x :   1 , y :   0}, // right
             {x :   0 , y :   1}, // down
             {x : - 1 , y :   0}  // left
-        ],
-        tileTypes  = {
-            0 : {                        // wall
-                isSolid  : true,
-                material : function () {
-                    return new THREE.MeshLambertMaterial({
-                        color : 0x827267
-                    });
-                }
-            },
-            1 : {                        // road
-                isSolid  : false,
-                material : function () {
-                    return new THREE.MeshLambertMaterial({
-                        color : 0xFFFFFF
-                    });
-                }
-            },
-            2 : {                        // room
-                isSolid  : false,
-                material : function () {
-                    return new THREE.MeshLambertMaterial({
-                        color : 0xF1F1F1
-                    });
-                }
-            },
-            3 : {                        // door
-                isSolid  : false,
-                material : function () {
-                    return new THREE.MeshLambertMaterial({
-                        color : 0xFFC8AD
-                    });
-                }
-            },
-            4 : {                        // waypoints
-                isSolid  : false,
-                material : function () {
-                    return new THREE.MeshLambertMaterial({
-                        color : 0xFF0000
-                    });
-                }
-            }
-        },
-        util = {
-            degToRad : function (degrees) {
-    			return degrees * Math.PI / 180;
-    		},
-            rotationMatrix : function (degrees) {
-                return [
-                      Math.cos(this.degToRad(degrees)).toFixed(),
-                      Math.sin(this.degToRad(degrees)).toFixed(), // should be -
-                    - Math.sin(this.degToRad(degrees)).toFixed(), // should be +
-                      Math.cos(this.degToRad(degrees)).toFixed()
-                ];
-            },
-            containsObject : function (list, object) {
-                for (var i = 0; i < list.length; i++) {
-                    if (_.isEqual(list[i], object)) {
-                        return false;
-                    }
-                }
-                return true;
-            },
-            turn : function (vector, direction) {
-                switch (direction) {
-                    case 'left':
-                        glMatrix.vec2.transformMat2(vector, vector, util.rotationMatrix(-90));
-                        break;
-                    case 'right':
-                        glMatrix.vec2.transformMat2(vector, vector, util.rotationMatrix(90));
-                        break;
-                    case 'back':
-                        glMatrix.vec2.transformMat2(vector, vector, util.rotationMatrix(180));
-                        break;
-                    default:
-                        console.log('invalid switch direction');
-                }
-            }
-        };
+        ];
 
     var Labyrinth = function (config) {
         this.width     = config.width * 2 + 1;
@@ -220,7 +142,7 @@ function (THREE, glMatrix, _) {
                     if (checkForBorders[i]) {
                         var first = currentTile.x + directionVector[0] * 2;
                         var second = currentTile.y + directionVector[1] * 2;
-                        isGivenDirectionPossible[i] = isGivenDirectionPossible[i] && tileTypes[that.map[first][second]].isSolid;
+                        isGivenDirectionPossible[i] = isGivenDirectionPossible[i] && util.tileTypes[that.map[first][second]].isSolid;
                         if (isGivenDirectionPossible[i]) {
                             possibleDirections.push({
                                 x : directionVector[0],
@@ -284,7 +206,7 @@ function (THREE, glMatrix, _) {
                 ) {
                     for (var j = 0; j < this.rooms[i][roomWidthOrHeight]; j++) {
                         var checkThisBlock = [position[0] + 2 * checkOnLeft[0], position[1] + 2 * checkOnLeft[1]];
-                        if (!tileTypes[this.map[checkThisBlock[0]][checkThisBlock[1]]].isSolid) {
+                        if (!util.tileTypes[this.map[checkThisBlock[0]][checkThisBlock[1]]].isSolid) {
                             this.rooms[i].thinWalls.push({
                                 x : position[0] + checkOnLeft[0],
                                 y : position[1] + checkOnLeft[1]
@@ -349,7 +271,7 @@ function (THREE, glMatrix, _) {
                             y : blockNextToPotentialDeadEnd.y
                         };
                     }
-                    glMatrix.vec2.transformMat2(direction, direction, util.rotationMatrix(90));
+                    util.turn(direction, 'right');
                 }
                 if (!isDoorFound && isCurrentReallyDeadEnd === 1) { // if there was more than 1 way from a dead end then it wasn't a dead end
                     newDeadEndCandidates.push(newDeadEndCandidate);
@@ -407,15 +329,19 @@ function (THREE, glMatrix, _) {
             spotLight.shadowMapWidth  = 1024;
             spotLight.shadowMapHeight = 1024;
 
-            spotLight.shadowCameraVisible = true;
+            // spotLight.shadowCameraVisible = true;
             spotLight.shadowCameraNear    = 5;
             spotLight.shadowCameraFar     = 200;
             spotLight.shadowCameraFov     = 120;
 
         scene.add(spotLight);
 
+        // var texture = THREE.ImageUtils.loadTexture( "minecraft_brick.jpg" );
+        // texture.wrapS = THREE.RepeatWrapping;
+        // texture.wrapT = THREE.RepeatWrapping;
+
         function cubeFactory (cubeType) {
-            return tileTypes[cubeType].material();
+            return util.tileTypes[cubeType].material();
         }
 
         for (var y = 0; y < this.height; y++) {
@@ -423,11 +349,11 @@ function (THREE, glMatrix, _) {
             for (var x = 0; x < this.width; x++) {
                 var cube = new THREE.Mesh(geometry, cubeFactory(this.map[x][y]));
                 // var cube = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
-                //         map : THREE.ImageUtils.loadTexture('minecraft_brick.jpg')
+                //         map : texture
                 //     }));
                 cube.position.x = x * step;
                 cube.position.y = y * step;
-                if (tileTypes[this.map[x][y]].isSolid) {
+                if (util.tileTypes[this.map[x][y]].isSolid) {
                     cube.position.z = 1 * step;
                     cube.castShadow    = true;
                 } else {

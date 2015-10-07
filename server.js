@@ -11,7 +11,6 @@ function send404 (response) {
 
 function sendPage (response, filePath, fileContents) {
     var mimeType = mime.lookup(path.basename(filePath));
-    console.log('mimeType : ', mimeType);
     response.writeHead(200, {'Content-Type' : mimeType});
     response.end(fileContents);
 }
@@ -34,8 +33,6 @@ function serverWorking (response, absPath) {
 
 http.createServer(function (request, response) {
     var filePath = false;
-    console.log(request.url);
-
 
     if (request.url == '/') {
         filePath = 'public/index.html';

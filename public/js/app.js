@@ -13,24 +13,25 @@ requirejs.config({
     }
 });
 
-requirejs(['labyrinth'],
-function (Labyrinth) {
+requirejs(['labyrinth', 'game'],
+function (Labyrinth, Game) {
     var labyrinthConfig = {
-        width          : 30,
-        height         : 30,
+        width          : 10,
+        height         : 10,
         size           : 5,
         // step           : 10,
         randomness     : 5,
         // ereaseDeadEnds : 0,
         rooms          : {
             roomAttempts   : 100,
-            pRoomWidthMax  : 7,
+            pRoomWidthMax  : 5,
             pRoomWidthMin  : 1,
-            pRoomHeightMax : 7,
+            pRoomHeightMax : 5,
             pRoomHeightMin : 1
         }
     };
 
     var labyrinth = new Labyrinth(labyrinthConfig);
-    labyrinth.draw(5);
+    var game = Game.getGameInstance();
+    game.draw(labyrinth.map, labyrinth.width, labyrinth.height);
 });
