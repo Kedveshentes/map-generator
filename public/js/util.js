@@ -7,7 +7,7 @@ function (glMatrix) {
         tileTypes : {
             0 : {                        // wall
                 isSolid : true,
-                color   : 0x827267
+                color   : 0xFFFFFF
             },
             1 : {                        // road
                 isSolid : false,
