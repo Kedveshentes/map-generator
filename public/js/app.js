@@ -16,14 +16,15 @@ requirejs.config({
 requirejs(['labyrinth', 'game'],
 function (Labyrinth, Game) {
     var labyrinthConfig = {
-        width          : 10,
-        height         : 10,
+        width          : 20,
+        height         : 20,
+        hallwayWidth   : 3,
         size           : 5,
         // step           : 10,
         randomness     : 5,
-        // ereaseDeadEnds : 0,
+        ereaseDeadEnds : 0,
         rooms          : {
-            roomAttempts   : 100,
+            roomAttempts   : 300,
             pRoomWidthMax  : 5,
             pRoomWidthMin  : 1,
             pRoomHeightMax : 5,

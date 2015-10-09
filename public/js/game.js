@@ -13,12 +13,12 @@ function (THREE, util) {
             width  : window.innerWidth - 20,
             height : window.innerHeight - 20
         };
-    var geometry = new THREE.BoxGeometry(1 * step, 1 * step, 1 * step);
     var tileTexture = THREE.ImageUtils.loadTexture("../sprites/tile.png");
         tileTexture.magFilter = THREE.NearestFilter;
         tileTexture.minFilter = THREE.LinearMipMapLinearFilter;
     // cube.material.map = THREE.ImageUtils.loadTexture("../sprites/tile.png");
 
+    var geometry = new THREE.BoxGeometry(1 * step, 1 * step, 1 * step);
     var cubeFactory = function (cubeType) {
         return new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
             color : util.tileTypes[cubeType].color,
@@ -38,8 +38,8 @@ function (THREE, util) {
 //      (_)                 (_)        (_)       (_)   (_)   (_)      (_)                    (_)                (_)        (_)
 //        (_)(_)(_)           (_)(_)(_)  (_)     (_)   (_)   (_)        (_)(_)(_)(_)         (_)                  (_)(_)(_)  (_)
 
-	var camera = new THREE.PerspectiveCamera(50, canvas.width / canvas.height, 0.1, 1000);
-        camera.position.set(10 * step, 10 * step, 20 * step);
+	var camera = new THREE.PerspectiveCamera(60, canvas.width / canvas.height, 0.1, 1000);
+        camera.position.set(10 * step, 10 * step, 60 * step);
 
 	var renderer = new THREE.WebGLRenderer();
 		renderer.setSize(canvas.width, canvas.height);
@@ -69,7 +69,7 @@ function (THREE, util) {
         spotLight.shadowCameraNear = 5;
         spotLight.shadowCameraFar  = 200;
         spotLight.shadowCameraFov  = 120;
-        // scene.add(spotLight);
+        scene.add(spotLight);
 
 
     var gameFieldGeometry,
@@ -96,7 +96,7 @@ function (THREE, util) {
 //     (_)                                                                (_)
 //     (_)                                                           (_)(_)
 
-    var playerGeometry = new THREE.BoxGeometry(0.4 * step, 0.4 * step, 0.4 * step),
+    var playerGeometry = new THREE.BoxGeometry(0.3 * step, 0.3 * step, 0.3 * step),
         player = new THREE.Mesh(playerGeometry, new THREE.MeshBasicMaterial({
             color : 0xAAAAFF
         }));
@@ -122,7 +122,7 @@ function (THREE, util) {
         flashLight.shadowCameraNear = 0.5 * step;
         flashLight.shadowCameraFar  = 50 * step;
         flashLight.shadowCameraFov  = 120;
-        scene.add(flashLight);
+        // scene.add(flashLight);
 
     var flashLightTarget = new THREE.Object3D();
         scene.add(flashLightTarget);
@@ -168,7 +168,7 @@ function (THREE, util) {
             flashLightTarget.position.z = 1;
             flashLight.target = flashLightTarget;
 
-            player.lookAt(intersects[0].point);
+            // player.lookAt(intersects[0].point);
         }
 	};
 //            (_)(_)
@@ -212,17 +212,14 @@ function (THREE, util) {
                 gameFieldGeometry = new THREE.PlaneGeometry((width + 1) * step, (height + 1) * step, 1);
                 gameFieldMaterial = new THREE.MeshPhongMaterial({color : 0x3344ff});
                 gameField         = new THREE.Mesh(gameFieldGeometry, gameFieldMaterial);
-                //
                 gameField.position.set(10 * step, 10 * step, 0.4 * step);
-                // gameField.castShadow    = true;
-                // gameField.receiveShadow = true;
-                //
                 scene.add(gameField);
-
 
                 spotLight.position.set(-30, height / 1.5, 60 * step);
 
                 flashLight.target = flashLightTarget;
+
+                var parentGeometry = new THREE.Geometry();
 
                 for (var y = 0; y < height; y++) {
                     map3d[y] = [];
@@ -238,10 +235,12 @@ function (THREE, util) {
                     		cube.receiveShadow = true;
                         }
                         cube.position.set(x * step, y * step, z);
-                        scene.add(cube);
                         map3d[y][x] = cube;
+                        scene.add(cube);
+                        // parentGeometry.merge(parentGeometry, cube);
                     }
                 }
+                // scene.add(new THREE.Mesh(parentGeometry));
                 spotLight.target = map3d[Math.floor(width / 2)][Math.floor(height / 2)];
             }
         };
