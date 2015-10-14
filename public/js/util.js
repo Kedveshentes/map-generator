@@ -6,22 +6,27 @@ function (glMatrix) {
         },
         tileTypes : {
             0 : {                        // wall
+                tile    : 'wall',
                 isSolid : true,
                 color   : 0x41403d
             },
             1 : {                        // road
+                tile    : 'road',
                 isSolid : false,
                 color   : 0xFFFFFF
             },
             2 : {                        // room
+                tile    : 'room',
                 isSolid : false,
                 color   : 0xF1F1F1
             },
             3 : {                        // door
+                tile    : 'door',
                 isSolid : false,
                 color   : 0xFFC8AD
             },
             4 : {                        // waypoints
+                tile    : 'waypoints',
                 isSolid : false,
                 color   : 0xFF0000
             }
