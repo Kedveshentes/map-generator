@@ -18,16 +18,16 @@ function (Labyrinth, Game) {
     var labyrinthConfig = {
         width          : 20,
         height         : 20,
-        hallwayWidth   : 3,
+        wallThickness  : 10, // default : 10
         size           : 5,
         // step           : 10,
         randomness     : 5,
-        ereaseDeadEnds : 0,
+        // ereaseDeadEnds : 0,
         rooms          : {
-            roomAttempts   : 300,
-            pRoomWidthMax  : 5,
+            roomAttempts   : 100,
+            pRoomWidthMax  : 3,
             pRoomWidthMin  : 1,
-            pRoomHeightMax : 5,
+            pRoomHeightMax : 3,
             pRoomHeightMin : 1
         }
     };

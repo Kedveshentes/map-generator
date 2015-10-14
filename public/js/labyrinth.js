@@ -37,15 +37,11 @@ function (THREE, _, util) {
         }, config.randomness);
         this.generateDoors();
         this.ereaseDeadEnds(config.ereaseDeadEnds); // param : depth of dead end ereasing; if not given, erease all
+        this.write();
     };
     Labyrinth.prototype.write = function () {
-        var string = '';
         for (var y = 0; y < this.height; y++) {
-            for (var x = 0; x < this.width; x++) {
-                string += ' ' + this.map[x][y];
-            }
-            console.log(string);
-            string = '';
+            console.log(this.map[y]);
         }
     };
     Labyrinth.prototype.generateRooms = function (config) {

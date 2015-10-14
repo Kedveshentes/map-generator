@@ -10,7 +10,7 @@ function (THREE, util) {
 		now;
 
     var canvas = {
-            width  : window.innerWidth - 20,
+            width  : window.innerWidth  - 20,
             height : window.innerHeight - 20
         };
     var tileTexture = THREE.ImageUtils.loadTexture("../sprites/tile.png");
@@ -18,45 +18,39 @@ function (THREE, util) {
         tileTexture.minFilter = THREE.LinearMipMapLinearFilter;
     // cube.material.map = THREE.ImageUtils.loadTexture("../sprites/tile.png");
 
-    var geometry = new THREE.BoxGeometry(1 * step, 1 * step, 1 * step);
-    var cubeFactory = function (cubeType) {
-        return new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
-            color : util.tileTypes[cubeType].color,
-            map   : tileTexture
-        }));
-    }
-
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2();
 
     var scene = new THREE.Scene();
 
-
-//        (_)(_)(_)           (_)(_)(_)           (_)(_)_(_)(_)        (_)(_)(_)(_)        (_)     (_)(_)         (_)(_)(_)
-//      (_)                            (_)       (_)   (_)   (_)      (_)         (_)        (_)(_)                        (_)
-//      (_)                   (_)(_)(_)(_)       (_)   (_)   (_)      (_)(_)(_)(_)(_)        (_)                  (_)(_)(_)(_)
-//      (_)                 (_)        (_)       (_)   (_)   (_)      (_)                    (_)                (_)        (_)
-//        (_)(_)(_)           (_)(_)(_)  (_)     (_)   (_)   (_)        (_)(_)(_)(_)         (_)                  (_)(_)(_)  (_)
-
-	var camera = new THREE.PerspectiveCamera(60, canvas.width / canvas.height, 0.1, 1000);
-        camera.position.set(10 * step, 10 * step, 60 * step);
+//
+//
+//
+//        (_)(_)(_) (_)(_)(_)      (_)(_)_(_)(_)  (_)(_)(_)(_)_(_)     (_)(_)(_)(_)(_)
+//      (_)                  (_)  (_)   (_)   (_)(_)         (_) (_)(_)               (_)
+//      (_)         (_)(_)(_)(_)  (_)   (_)   (_)(_)(_)(_)(_)(_) (_)         (_)(_)(_)(_)
+//      (_)       (_)        (_)  (_)   (_)   (_)(_)             (_)       (_)        (_)_
+//        (_)(_)(_) (_)(_)(_)  (_)(_)   (_)   (_)  (_)(_)(_)(_)  (_)         (_)(_)(_)  (_)
+//
+//
+	var camera = new THREE.PerspectiveCamera(90, canvas.width / canvas.height, 0.1, 1000);
+        camera.position.set(10 * step, 10 * step, 8 * step);
 
 	var renderer = new THREE.WebGLRenderer();
 		renderer.setSize(canvas.width, canvas.height);
         renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
         renderer.shadowMap.enabled = true;
         renderer.shadowMapSoft     = true;
-
-//        (_)(_)                  (_)                                  (_)                     (_)
-//           (_)                                                       (_)                     (_)
-//           (_)               (_)(_)               (_)(_)(_)(_)       (_)(_)(_)(_)         (_)(_)(_)(_)          (_)(_)(_)(_)
-//           (_)                  (_)             (_)        (_)       (_)        (_)          (_)              (_)
-//           (_)                  (_)             (_)        (_)       (_)        (_)          (_)                (_)(_)(_)(_)_
-//           (_)                  (_)             (_)        (_)       (_)        (_)          (_)    (_)                    (_)
-//        (_)(_)(_)            (_)(_)(_)            (_)(_)(_)(_)       (_)        (_)            (_)(_)           (_)(_)(_)(_)
-//                                                           (_)
-//                                                  (_)(_)(_)
-
+//
+//        (_)(_)      (_)                (_)             (_)
+//           (_)                         (_)             (_)
+//           (_)   (_)(_)    (_)(_)(_)(_)(_)(_)(_)(_)_(_)(_)(_)(_)_(_)(_)(_)(_)
+//           (_)      (_)  (_)        (_)(_)        (_)  (_)     (_)
+//           (_)      (_)  (_)        (_)(_)        (_)  (_)       (_)(_)(_)(_)_
+//           (_)      (_)  (_)        (_)(_)        (_)  (_)    (_)           (_)
+//        (_)(_)(_)(_)(_)(_) (_)(_)(_)(_)(_)        (_)    (_)(_)  (_)(_)(_)(_)
+//                                    (_)
+//                           (_)(_)(_)
     var light = new THREE.AmbientLight(0x666666);
         // scene.add(light);
 
@@ -69,7 +63,10 @@ function (THREE, util) {
         spotLight.shadowCameraNear = 5;
         spotLight.shadowCameraFar  = 200;
         spotLight.shadowCameraFov  = 120;
-        scene.add(spotLight);
+
+
+
+        // scene.add(spotLight);
 
 
     var gameFieldGeometry,
@@ -86,16 +83,16 @@ function (THREE, util) {
 
         scene.add(gameField);
 
-//                             (_)(_)
-//                                (_)
-//     (_)(_)(_)(_)               (_)              (_)(_)(_)        (_)             (_)     (_)(_)(_)(_)        (_)     (_)(_)
-//     (_)        (_)             (_)                       (_)       (_)         (_)      (_)         (_)        (_)(_)
-//     (_)        (_)             (_)              (_)(_)(_)(_)         (_)     (_)        (_)(_)(_)(_)(_)        (_)
-//     (_)        (_)             (_)            (_)        (_)           (_)_(_)          (_)                    (_)
-//     (_)(_)(_)(_)            (_)(_)(_)           (_)(_)(_)  (_)           (_)              (_)(_)(_)(_)         (_)
-//     (_)                                                                (_)
-//     (_)                                                           (_)(_)
-
+//
+//                  (_)(_)
+//                     (_)
+//     (_)(_)(_)(_)    (_)    (_)(_)(_)  (_)             (_)(_)(_)(_)(_)_(_)     (_)(_)
+//     (_)        (_)  (_)             (_) (_)         (_) (_)         (_) (_)(_)
+//     (_)        (_)  (_)    (_)(_)(_)(_)   (_)     (_)   (_)(_)(_)(_)(_) (_)
+//     (_)        (_)  (_)  (_)        (_)     (_)_(_)     (_)             (_)
+//     (_)(_)(_)(_) (_)(_)(_) (_)(_)(_)  (_)     (_)         (_)(_)(_)(_)  (_)
+//     (_)                                     (_)
+//     (_)                                (_)(_)
     var playerGeometry = new THREE.BoxGeometry(0.3 * step, 0.3 * step, 0.3 * step),
         player = new THREE.Mesh(playerGeometry, new THREE.MeshBasicMaterial({
             color : 0xAAAAFF
@@ -103,7 +100,7 @@ function (THREE, util) {
         player.position.set(10 * step, 10 * step, 1 * step);
         scene.add(player);
 
-    var playerAura = new THREE.PointLight(0xccddee, 0.3, 1 * step);
+    var playerAura = new THREE.PointLight(0xffffff, 0.5, 1.2 * step);
         scene.add(playerAura);
 
     var flashLight = new THREE.SpotLight(0xffffff);
@@ -122,40 +119,168 @@ function (THREE, util) {
         flashLight.shadowCameraNear = 0.5 * step;
         flashLight.shadowCameraFar  = 50 * step;
         flashLight.shadowCameraFov  = 120;
-        // scene.add(flashLight);
+
+
+
+
+        scene.add(flashLight);
+
+
+
+
 
     var flashLightTarget = new THREE.Object3D();
         scene.add(flashLightTarget);
 
+//            (_)(_)                         (_)                                      (_)
+//          (_)                              (_)
+//       (_)(_)(_)(_)(_)(_)      (_)(_)(_)(_)(_)(_)(_)    (_)(_)(_)  (_)     (_)(_)(_)(_)   (_)(_)(_)(_)    (_)(_)(_)(_)
+//          (_)            (_) (_)           (_)       (_)         (_) (_)(_)         (_)  (_)         (_)(_)
+//          (_)   (_)(_)(_)(_) (_)           (_)       (_)         (_) (_)            (_)  (_)(_)(_)(_)(_)  (_)(_)(_)(_)
+//          (_) (_)        (_)_(_)           (_)    (_)(_)         (_) (_)            (_)  (_)                         (_)
+//          (_)   (_)(_)(_)  (_) (_)(_)(_)     (_)(_)     (_)(_)(_)    (_)         (_)(_)(_) (_)(_)(_)(_)   (_)(_)(_)(_)
+
+    var geometry = new THREE.BoxGeometry(1 * step, 1 * step, 1 * step);
+    var cubeFactory = function (cubeType) {
+        return new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
+            color : util.tileTypes[cubeType].color,
+            map   : tileTexture
+        }));
+    }
+
+    var middleOfWallGeometry  = new THREE.BoxGeometry(0.2 * step, 0.2 * step, 1 * step);
+
+    var fullUpWallGeometry    = new THREE.BoxGeometry(0.2 * step, 0.2 * step, 1 * step);
+    var fullRightWallGeometry = new THREE.BoxGeometry(0.2 * step, 0.2 * step, 1 * step);
+    var fullDownWallGeometry  = new THREE.BoxGeometry(0.2 * step, 0.2 * step, 1 * step);
+    var fullLeftWallGeometry  = new THREE.BoxGeometry(0.2 * step, 0.2 * step, 1 * step);
+
+    var thinUpWallGeometry    = new THREE.BoxGeometry(0.2 * step, 0.4 * step, 1 * step);
+    var thinRightWallGeometry = new THREE.BoxGeometry(0.4 * step, 0.2 * step, 1 * step);
+    var thinDownWallGeometry  = new THREE.BoxGeometry(0.2 * step, 0.4 * step, 1 * step);
+    var thinLeftWallGeometry  = new THREE.BoxGeometry(0.4 * step, 0.2 * step, 1 * step);
+
+    var cornerRUWallGeometry  = new THREE.BoxGeometry(0.2 * step, 0.2 * step, 1 * step);
+    var cornerRDWallGeometry  = new THREE.BoxGeometry(0.2 * step, 0.2 * step, 1 * step);
+    var cornerLDWallGeometry  = new THREE.BoxGeometry(0.2 * step, 0.2 * step, 1 * step);
+    var cornerLUWallGeometry  = new THREE.BoxGeometry(0.2 * step, 0.2 * step, 1 * step);
+
+
+
+
+
+
+    // var currentWall;
+
+
+    var wallGenerator = function (map, xCoord, yCoord) {
+
+        var wallMatrix = [
+            [],
+            [],
+            [],
+        ];
+        var currentWall = new THREE.Geometry();
+
+        var position;
+
+        var mapTile;
+        position = new THREE.Vector2(-1, -1);
+
+        for (var y = 0; y < 3; y++) {
+            position.x = -1;
+            for (var x = 0; x < 3; x++) {
+                if (map[yCoord + position.y] === undefined || map[yCoord + position.y][xCoord + position.x] === undefined) {
+                    wallMatrix[y][x] = false;
+                } else {
+                    mapTile = map[yCoord + position.y][xCoord + position.x];
+                    wallMatrix[y][x] = util.tileTypes[mapTile].isSolid;
+                }
+                position.x += 1;
+            }
+            position.y += 1;
+        }
+
+        var meshes = [],
+            centerOfWall,
+            thinUpWall,
+            thinRightWall,
+            thinDownWall,
+            thinLeftWall;
+
+        var material = new THREE.MeshPhongMaterial({color : 0x3344ff});
+
+        centerOfWall = new THREE.Mesh(middleOfWallGeometry, material);
+        meshes.push(centerOfWall);
+
+        if (wallMatrix[2][1]) {
+            thinUpWall = new THREE.Mesh(thinUpWallGeometry, material);
+            thinUpWall.position.y = 0.3 * step;
+            meshes.push(thinUpWall);
+        }
+
+        if (wallMatrix[1][2]) {
+            thinRightWall = new THREE.Mesh(thinRightWallGeometry, material);
+            thinRightWall.position.x = 0.3 * step;
+            meshes.push(thinRightWall);
+        }
+
+        if (wallMatrix[0][1]) {
+            thinDownWall = new THREE.Mesh(thinDownWallGeometry, material);
+            thinDownWall.position.y = - 0.3 * step;
+            meshes.push(thinDownWall);
+        }
+
+        if (wallMatrix[1][0]) {
+            thinLeftWall = new THREE.Mesh(thinLeftWallGeometry, material);
+            thinLeftWall.position.x = - 0.3 * step;
+            meshes.push(thinLeftWall);
+        }
+
+        for (var i = 0; i < meshes.length; i++) {
+            meshes[i].updateMatrix();
+            currentWall.merge(meshes[i].geometry, meshes[i].matrix);
+        }
+
+        return new THREE.Mesh(currentWall, new THREE.MeshPhongMaterial({
+            color : util.tileTypes[0].color,
+            map   : tileTexture
+        }));
+    };
+
+
 
 
 //
-//                                                           (_)                               (_)
-//                                                           (_)                               (_)
-//     (_)       (_)        (_)(_)(_)(_)            (_)(_)(_)(_)        (_)(_)(_)           (_)(_)(_)(_)         (_)(_)(_)(_)_
-//     (_)       (_)        (_)        (_)        (_)        (_)                 (_)           (_)              (_)         (_)
-//     (_)       (_)        (_)        (_)        (_)        (_)        (_)(_)(_)(_)           (_)              (_)(_)(_)(_)(_)
-//     (_)       (_)        (_)        (_)        (_)        (_)      (_)        (_)           (_)    (_)       (_)
-//       (_)(_)(_) (_)      (_)(_)(_)(_)            (_)(_)(_)(_)        (_)(_)(_)  (_)           (_)(_)           (_)(_)(_)(_)
-//                          (_)
-//                          (_)
+//                                             (_)                (_)
+//                                             (_)                (_)
+//     (_)       (_)  (_)(_)(_)(_)    (_)(_)(_)(_)  (_)(_)(_)  (_)(_)(_)(_)  (_)(_)(_)(_)_
+//     (_)       (_)  (_)        (_)(_)        (_)           (_)  (_)       (_)         (_)
+//     (_)       (_)  (_)        (_)(_)        (_)  (_)(_)(_)(_)  (_)       (_)(_)(_)(_)(_)
+//     (_)       (_)  (_)        (_)(_)        (_)(_)        (_)  (_)    (_)(_)
+//       (_)(_)(_) (_)(_)(_)(_)(_)    (_)(_)(_)(_)  (_)(_)(_)  (_)  (_)(_)    (_)(_)(_)(_)
+//                    (_)
+//                    (_)
     var update = function () {
         handleKeys(delta);
 
         flashLight.position.set(player.position.x, player.position.y, 1 * step);
         playerAura.position.set(player.position.x, player.position.y, 1 * step);
 
-        camera.position.x = player.position.x;
-        camera.position.y = player.position.y;
+
     }
-//                                                                                (_)
-//                                                                                (_)
-//     (_)     (_)(_)        (_)(_)(_)(_)         (_)(_)(_)(_)           (_)(_)(_)(_)       (_)(_)(_)(_)        (_)     (_)(_)
-//       (_)(_)             (_)         (_)       (_)        (_)       (_)        (_)      (_)         (_)        (_)(_)
-//       (_)                (_)(_)(_)(_)(_)       (_)        (_)       (_)        (_)      (_)(_)(_)(_)(_)        (_)
-//       (_)                (_)                   (_)        (_)       (_)        (_)      (_)                    (_)
-//       (_)                  (_)(_)(_)(_)        (_)        (_)         (_)(_)(_)(_)        (_)(_)(_)(_)         (_)
 //
+//                                                          (_)
+//                                                          (_)
+//     (_)     (_)(_)(_)(_)(_)(_)  (_)(_)(_)(_)    (_)(_)(_)(_) (_)(_)(_)(_)_(_)     (_)(_)
+//       (_)(_)     (_)         (_)(_)        (_)(_)        (_)(_)         (_) (_)(_)
+//       (_)        (_)(_)(_)(_)(_)(_)        (_)(_)        (_)(_)(_)(_)(_)(_) (_)
+//       (_)        (_)            (_)        (_)(_)        (_)(_)             (_)
+//       (_)          (_)(_)(_)(_) (_)        (_)  (_)(_)(_)(_)  (_)(_)(_)(_)  (_)
+//
+//
+    var distanceOfPlayerAndMouse = new THREE.Vector2();
+
     var render = function () {
 		renderer.render(scene, camera);
         raycaster.setFromCamera(mouse, camera);
@@ -168,16 +293,24 @@ function (THREE, util) {
             flashLightTarget.position.z = 1;
             flashLight.target = flashLightTarget;
 
+
+            distanceOfPlayerAndMouse.x = intersects[0].point.x - player.position.x;
+            distanceOfPlayerAndMouse.y = intersects[0].point.y - player.position.y;
+
+            camera.position.x = player.position.x + distanceOfPlayerAndMouse.x / 6;
+            camera.position.y = player.position.y + distanceOfPlayerAndMouse.y / 6;
             // player.lookAt(intersects[0].point);
         }
 	};
+//
 //            (_)(_)
 //          (_)
-//       (_)(_)(_)          (_)     (_)(_)         (_)(_)(_)           (_)(_)_(_)(_)        (_)(_)(_)(_)_
-//          (_)               (_)(_)                        (_)       (_)   (_)   (_)      (_)         (_)
-//          (_)               (_)                  (_)(_)(_)(_)       (_)   (_)   (_)      (_)(_)(_)(_)(_)
-//          (_)               (_)                (_)        (_)       (_)   (_)   (_)      (_)
-//          (_)               (_)                  (_)(_)(_)  (_)     (_)   (_)   (_)        (_)(_)(_)(_)
+//       (_)(_)(_)(_)     (_)(_)(_)(_)(_)      (_)(_)_(_)(_)  (_)(_)(_)(_)_
+//          (_)     (_)(_)               (_)  (_)   (_)   (_)(_)         (_)
+//          (_)     (_)         (_)(_)(_)(_)  (_)   (_)   (_)(_)(_)(_)(_)(_)
+//          (_)     (_)       (_)        (_)  (_)   (_)   (_)(_)
+//          (_)     (_)         (_)(_)(_)  (_)(_)   (_)   (_)  (_)(_)(_)(_)
+//
 //
 	var frame = function (timerate) {
 		now   = util.timestamp();
@@ -191,15 +324,16 @@ function (THREE, util) {
 		requestAnimationFrame(frame);
 	};
 
-
-//           (_)                                       (_)                (_)
-//                                                                        (_)
-//        (_)(_)             (_)(_)(_)(_)           (_)(_)             (_)(_)(_)(_)
-//           (_)             (_)        (_)            (_)                (_)
-//           (_)             (_)        (_)            (_)                (_)
-//           (_)             (_)        (_)            (_)                (_)    (_)
-//        (_)(_)(_)          (_)        (_)         (_)(_)(_)               (_)(_)
-
+//
+//           (_)                    (_)   (_)
+//                                        (_)
+//        (_)(_)   (_)(_)(_)(_)  (_)(_)(_)(_)(_)(_)
+//           (_)   (_)        (_)   (_)   (_)
+//           (_)   (_)        (_)   (_)   (_)
+//           (_)   (_)        (_)   (_)   (_)    (_)
+//        (_)(_)(_)(_)        (_)(_)(_)(_)  (_)(_)
+//
+//
     var init = function () {
         frame();
         return {
@@ -208,8 +342,7 @@ function (THREE, util) {
                 camera.lookAt(player.position);
                 // camera.lookAt(new THREE.Vector3(Math.floor(width / 2 * step), Math.floor(height / 2 * step), 0));
 
-
-                gameFieldGeometry = new THREE.PlaneGeometry((width + 1) * step, (height + 1) * step, 1);
+                gameFieldGeometry = new THREE.PlaneGeometry((width * 2 + 1) * step, (height * 2 + 1) * step, 1);
                 gameFieldMaterial = new THREE.MeshPhongMaterial({color : 0x3344ff});
                 gameField         = new THREE.Mesh(gameFieldGeometry, gameFieldMaterial);
                 gameField.position.set(10 * step, 10 * step, 0.4 * step);
@@ -219,25 +352,33 @@ function (THREE, util) {
 
                 flashLight.target = flashLightTarget;
 
-                var parentGeometry = new THREE.Geometry();
+                var flippedMap = [];
+                for (var i = 0; i < map.length; i++) {
+                    flippedMap.push(map[map.length - 1 - i]);
+                }
+
 
                 for (var y = 0; y < height; y++) {
                     map3d[y] = [];
                     for (var x = 0; x < width; x++) {
-                        var cube = cubeFactory(map[x][y]);
+                        var cube = cubeFactory(map[y][x]);
                         var z;
-                        if (util.tileTypes[map[x][y]].isSolid) {
-                            z = 1 * step;
+                        var wall;
+                        if (util.tileTypes[map[y][x]].isSolid) {
                             cube.castShadow = true;
                     		cube.receiveShadow = true;
-                        } else {
-                            z = 0;
-                    		cube.receiveShadow = true;
+
+                            wall = wallGenerator(map, x, y);
+
+                            wall.castShadow = true;
+                    		wall.receiveShadow = true;
+                            wall.position.set(x * step, y * step, 1 * step);
+                            scene.add(wall);
                         }
-                        cube.position.set(x * step, y * step, z);
+                		cube.receiveShadow = true;
+                        cube.position.set(x * step, y * step, 0);
                         map3d[y][x] = cube;
                         scene.add(cube);
-                        // parentGeometry.merge(parentGeometry, cube);
                     }
                 }
                 // scene.add(new THREE.Mesh(parentGeometry));
