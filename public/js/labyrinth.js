@@ -37,7 +37,9 @@ function (THREE, _, util) {
         }, config.randomness);
         this.generateDoors();
         this.ereaseDeadEnds(config.ereaseDeadEnds); // param : depth of dead end ereasing; if not given, erease all
-        this.write();
+        if (config.write === true) {
+            this.write();
+        }
     };
     Labyrinth.prototype.write = function () {
         for (var y = 0; y < this.height; y++) {
@@ -46,21 +48,20 @@ function (THREE, _, util) {
     };
     Labyrinth.prototype.generateRooms = function (config) {
 		var room 		  = {},
-			that		  = this,
 			roomWidthMax  = config.pRoomWidthMax  || 10,
 			roomWidthMin  = config.pRoomWidthMin  || 5,
 			roomHeightMax = config.pRoomHeightMax || 10,
 			roomHeightMin = config.pRoomHeightMin || 5;
 
 		var checkRoomCollision = function (room) {
-			if (that.rooms.length === 0) {
+			if (this.rooms.length === 0) {
 				return false;
 			}
-			for (var i = 0; i < that.rooms.length; i++) {
-                if (room.x < that.rooms[i].x + that.rooms[i].width &&
-					room.x + room.width > that.rooms[i].x &&
-					room.y < that.rooms[i].y + that.rooms[i].height &&
-					room.y + room.height > that.rooms[i].y) {
+			for (var i = 0; i < this.rooms.length; i++) {
+                if (room.x < this.rooms[i].x + this.rooms[i].width &&
+					room.x + room.width > this.rooms[i].x &&
+					room.y < this.rooms[i].y + this.rooms[i].height &&
+					room.y + room.height > this.rooms[i].y) {
 				   	return true;
 				}
 			}
@@ -70,13 +71,13 @@ function (THREE, _, util) {
 		for (var i = 0; i < config.roomAttempts; i++) {
 			room.width  = Math.round((Math.round(Math.random() * (roomWidthMax  - roomWidthMin))  + roomWidthMin) / 2) * 2 + 1;
 			room.height = Math.round((Math.round(Math.random() * (roomHeightMax - roomHeightMin)) + roomHeightMin) / 2) * 2 + 1;
-			room.x      = Math.round((Math.round(Math.random() * (that.width - room.width - 6) + 3)) / 2) * 2 + 1;
-			room.y      = Math.round((Math.round(Math.random() * (that.height - room.height - 6) + 3)) / 2) * 2 + 1;
+			room.x      = Math.round((Math.round(Math.random() * (this.width - room.width - 6) + 3)) / 2) * 2 + 1;
+			room.y      = Math.round((Math.round(Math.random() * (this.height - room.height - 6) + 3)) / 2) * 2 + 1;
             // random generating a number in an interval, rounding it, divided by two and rounded so it's guaranteed even,
             // multiplied by two, and add 1 to make it odd but around the original size
 
-			if (checkRoomCollision(room) === false) {
-				that.rooms.push({
+			if (checkRoomCollision.call(this, room) === false) {
+				this.rooms.push({
 					width  : room.width,
 					height : room.height,
 					x      : room.x,
@@ -85,7 +86,7 @@ function (THREE, _, util) {
 
 				for (var x = room.x; x < room.x + room.width; x++) {
 					for (var y = room.y; y < room.y + room.height; y++) {
-						that.map[x][y] = 2;
+						this.map[x][y] = 2;
 					}
 				}
 			}
@@ -93,16 +94,15 @@ function (THREE, _, util) {
 	};
     Labyrinth.prototype.generateLabyrinth = function (currentTile, randomFactor) {
         var roadStack           = [],
-            that                = this,
             canPushMoreDeadEnds = true,
             possibleDirections,
             nextBlock,
             direction;
 
         var checkLabyrinthFill = function () {
-            for (var y = 1; y < that.height - 1; y += 2) {
-                for (var x = 1; x < that.width - 1; x += 2) {
-                    if (that.map[x][y] === 0) {
+            for (var y = 1; y < this.height - 1; y += 2) {
+                for (var x = 1; x < this.width - 1; x += 2) {
+                    if (this.map[x][y] === 0) {
                         return {
                             x : x,
                             y : y
@@ -115,17 +115,17 @@ function (THREE, _, util) {
 
         var floodFill = function (currentTile) {
             roadStack.push(currentTile);
-            that.deadends.push(currentTile);
-            that.map[currentTile.x][currentTile.y] = 1;
+            this.deadends.push(currentTile);
+            this.map[currentTile.x][currentTile.y] = 1;
 
             while (roadStack.length > 0) {
                 possibleDirections = [];
-                that.map[currentTile.x][currentTile.y] = 1;
+                this.map[currentTile.x][currentTile.y] = 1;
 
                 var checkForBorders = [
                     (currentTile.y > 2),
-                    (currentTile.x < that.width - 3),
-                    (currentTile.y < that.height - 3),
+                    (currentTile.x < this.width - 3),
+                    (currentTile.y < this.height - 3),
                     (currentTile.x > 2)
                 ];
 
@@ -138,7 +138,7 @@ function (THREE, _, util) {
                     if (checkForBorders[i]) {
                         var first = currentTile.x + directionVector[0] * 2;
                         var second = currentTile.y + directionVector[1] * 2;
-                        isGivenDirectionPossible[i] = isGivenDirectionPossible[i] && util.tileTypes[that.map[first][second]].isSolid;
+                        isGivenDirectionPossible[i] = isGivenDirectionPossible[i] && util.tileTypes[this.map[first][second]].isSolid;
                         if (isGivenDirectionPossible[i]) {
                             possibleDirections.push({
                                 x : directionVector[0],
@@ -152,7 +152,7 @@ function (THREE, _, util) {
                 if (possibleDirections.length === 0) {
                     nextBlock = roadStack.pop();
                     if (canPushMoreDeadEnds === true) {
-                        that.deadends.push(currentTile);
+                        this.deadends.push(currentTile);
                         canPushMoreDeadEnds = false;
                     }
                 } else {
@@ -169,8 +169,8 @@ function (THREE, _, util) {
                         y : currentTile.y + direction.y * 2
                     };
 
-                    that.map[nextBlock.x - direction.x][nextBlock.y - direction.y] = 1;
-                    that.map[nextBlock.x][nextBlock.y] = 1;
+                    this.map[nextBlock.x - direction.x][nextBlock.y - direction.y] = 1;
+                    this.map[nextBlock.x][nextBlock.y] = 1;
 
                     canPushMoreDeadEnds = true;
                 }
@@ -178,8 +178,8 @@ function (THREE, _, util) {
             }
         };
         do {
-            floodFill(currentTile);
-            currentTile = checkLabyrinthFill();
+            floodFill.call(this, currentTile);
+            currentTile = checkLabyrinthFill.call(this);
         } while (currentTile !== false);
     };
     Labyrinth.prototype.generateDoors = function () {

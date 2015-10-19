@@ -1,3 +1,5 @@
+'use strict';
+
 requirejs.config({
     baseUrl : 'js',
     paths : {
@@ -16,12 +18,13 @@ requirejs.config({
 requirejs(['labyrinth', 'game'],
 function (Labyrinth, Game) {
     var labyrinthConfig = {
-        width          : 20,
-        height         : 20,
+        width          : 15,
+        height         : 15,
         wallThickness  : 10, // default : 10
         size           : 5,
         // step           : 10,
         randomness     : 5,
+        write          : false,
         // ereaseDeadEnds : 0,
         rooms          : {
             roomAttempts   : 100,
@@ -37,10 +40,28 @@ function (Labyrinth, Game) {
     game.draw(labyrinth.map, labyrinth.width, labyrinth.height);
 
     window.main = function () {
-        window.requestAnimationFrame( main );
-        // console.log('asd');
-      // Whatever your main loop needs to do.
+        window.requestAnimationFrame(main);
+    //     // console.log('asd');
+    //   // Whatever your main loop needs to do.
     };
     main();
+
+
+    // var datShape = new Shape('kalacs', 2, 3);
+
+    // console.log(datShape);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 });

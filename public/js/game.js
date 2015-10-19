@@ -69,6 +69,7 @@ function (THREE, util) {
         // scene.add(spotLight);
 
 
+
     var gameFieldGeometry,
         gameFieldMaterial,
         gameField;
