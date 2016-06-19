@@ -1,7 +1,11 @@
-#myCanvas {
+#canvas {
 	border : none;
 }
 
 body {
 	margin: 0px;
+}
+
+.test {
+	color: blue;
 }
