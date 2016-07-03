@@ -15,6 +15,10 @@
     "combobreaker",
     "generator"
   ],
+  "scripts": {
+    "start": "webpack-dev-server --inline",
+    "bundle" : "webpack"
+  },
   "dependencies": {
     "babel-polyfill": "^6.9.1",
     "babel-runtime": "^6.9.2",
@@ -23,7 +27,6 @@
     "three": "^0.78.0",
     "underscore": "^1.8.3"
   },
-  "license": "MIT",
   "devDependencies": {
     "babel": "^6.5.2",
     "babel-core": "^6.9.1",
@@ -33,10 +36,7 @@
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
   },
-  "scripts": {
-    "start": "webpack",
-    "dev": "webpack-dev-server --inline"
-  },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Kedveshentes/map-generator/issues"
   },
