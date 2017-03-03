@@ -4,6 +4,8 @@ import * as _ from 'underscore';
 import { Game } from './game';
 import { Labyrinth } from './labyrinth';
 
+import './style.css';
+
 let labyrinthConfig = {
 	width          : 10,
 	height         : 10,

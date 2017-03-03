@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 var path = require('path');
+var HtmlwebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
 	entry: [
@@ -11,8 +12,7 @@ module.exports = {
 		contentBase: "./src"
 	},
 	output: {
-		path: './dist',
-		publicPath: "/public/",
+		path: __dirname + '/dist',
 		filename: 'app.bundle.js'
 	},
 	// loaders: [
@@ -22,16 +22,23 @@ module.exports = {
 	// 	}
 	// ],
 	module: {
-		loaders: [
+		rules: [
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
-				loader: 'babel-loader?presets[]=es2015'
+				loader: 'babel-loader',
+				options: {
+					presets: ['es2015']
+				}
+			}, {
+				test: /\.css$/,
+				loader: 'style-loader!css-loader'
 			}
 		]
 	},
-	resolve: {
-		extensions: ['', '.es6.js', '.js']
-	},
-	debug: true
+	plugins: [
+		new HtmlwebpackPlugin({
+			template: 'src/index.html'
+		})
+	]
 };
