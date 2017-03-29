@@ -6,9 +6,9 @@ import { worldInstance } from './world';
 import { Wall } from './wall';
 
 var geometry = new THREE.BoxGeometry(1 * step, 1 * step, 1 * step);
-var cubeFactory = function (cubeType) {
+var cubeFactory = function (cube) {
 	return new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
-		color : util.tileTypes[cubeType].color
+		color : util.tileTypes[cube.type].color
 		// ,
 		// map   : tileTexture
 	}));
@@ -62,13 +62,15 @@ class Game {
 
 	drawLabyrinthTiles () {
 		let wallsGeometry = new THREE.Geometry();
-		for (var y = 0; y < this.labyrinth.height; y++) {
+		for (var y = 0; y < this.labyrinth.map[0].length; y++) {
 			this.map3d[y] = [];
-			for (var x = 0; x < this.labyrinth.width; x++) {
-				var cube = cubeFactory(this.labyrinth.map[y][x]);
+			for (var x = 0; x < this.labyrinth.map.length; x++) {
+				let currentTile = this.labyrinth.map[y][x];
+
+				var cube = cubeFactory(currentTile);
 				var z;
 				var wall;
-				if (util.tileTypes[this.labyrinth.map[y][x]].isSolid) {
+				if (util.tileTypes[currentTile.type].isSolid) {
 
 					wall = new Wall(this.labyrinth.map, x, y);
 
@@ -82,12 +84,12 @@ class Game {
 				cube.receiveShadow = true;
 				cube.position.set(x * step, y * step, -0.5 * step);
 				this.map3d[y][x] = cube;
-				// this.world.scene.add(cube);
+				this.world.scene.add(cube);
 			}
 		}
 
 		let walls = new THREE.Mesh(wallsGeometry, new THREE.MeshPhongMaterial({
-			color : util.tileTypes[0].color
+			color : util.tileTypes['wall'].color
 		}));
 
 		walls.castShadow = true;

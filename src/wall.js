@@ -38,7 +38,7 @@ export class Wall {
 					wallMatrix[y][x] = false;
 				} else {
 					mapTile = map[yCoord + position.y][xCoord + position.x];
-					wallMatrix[y][x] = util.tileTypes[mapTile].isSolid;
+					wallMatrix[y][x] = util.tileTypes[mapTile.type].isSolid;
 				}
 				position.x += 1;
 			}
@@ -87,7 +87,7 @@ export class Wall {
 		}
 
 		return new THREE.Mesh(currentWall, new THREE.MeshPhongMaterial({
-			color : util.tileTypes[0].color
+			color : util.tileTypes['wall'].color
 			// ,
 			// map   : tileTexture
 		}));

@@ -11,30 +11,30 @@ let util = {
 		return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
 	},
 	tileTypes : {
-		0 : {                        // wall
+		'wall' : {                        // wall
 			tile    : 'wall',
 			isSolid : true,
-			color   : 0x41403d
+			color   : 0xffffff
 		},
-		1 : {                        // road
+		'road' : {                        // road
 			tile    : 'road',
 			isSolid : false,
-			color   : 0xFFFFFF
+			color   : 0xffffff
 		},
-		2 : {                        // room
+		'room' : {                        // room
 			tile    : 'room',
 			isSolid : false,
-			color   : 0xDFEFFF
+			color   : 0xc3e1ff
 		},
-		3 : {                        // door
+		'door' : {                        // door
 			tile    : 'door',
 			isSolid : false,
-			color   : 0xAFDFEF
+			color   : 0xafdfef
 		},
-		4 : {                        // waypoints
-			tile    : 'waypoints',
+		'waypoint' : {                    // waypoints
+			tile    : 'waypoint',
 			isSolid : false,
-			color   : 0xFF0000
+			color   : 0xff0000
 		}
 	},
 	degToRad : function (degrees) {

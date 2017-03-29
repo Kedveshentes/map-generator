@@ -2,7 +2,9 @@
 
 import * as _ from 'underscore';
 import { Game } from './game';
-import { Labyrinth } from './labyrinth';
+import { generateLabyrinth } from './labyrinth';
+
+import { config } from './config';
 
 import './style.css';
 
@@ -24,7 +26,10 @@ let labyrinthConfig = {
 	}
 };
 
-let labyrinth = new Labyrinth(labyrinthConfig);
+// let labyrinth = new Labyrinth(labyrinthConfig);
+
+
+let labyrinth = generateLabyrinth(config);
 
 var game = new Game(labyrinth);
 // game.start();
