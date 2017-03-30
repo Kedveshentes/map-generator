@@ -17,7 +17,7 @@ class World {
 		this.scene.add(this.gameField);
 
 		this.camera = new THREE.PerspectiveCamera(90, canvas.width / canvas.height, 0.1, 1000);
-		this.camera.position.set((10 - 5) * step, (10 - 5) * step, 8 * step);
+		this.camera.position.set((10 - 5) * step, (10 - 5) * step, 18 * step);
 
 		this.renderer = new THREE.WebGLRenderer();
 		this.renderer.setSize(canvas.width, canvas.height);
@@ -25,7 +25,7 @@ class World {
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMapSoft = true;
 
-		// this.light = new THREE.AmbientLight(0x666666);
+		// this.light = new THREE.AmbientLight(0xffffff);
 		// this.scene.add(this.light);
 
 		this.spotLight = new THREE.SpotLight(0xaaaaaa);
@@ -37,7 +37,7 @@ class World {
 		this.spotLight.shadow.camera.far = 2000;
 		this.spotLight.shadow.camera.fov = 120;
 		this.spotLight.shadow.camera.visible = true;
-		// this.scene.add(this.spotLight);
+		this.scene.add(this.spotLight);
 
 		function buildAxis (src, dst, colorHex, dashed) {
 			var geom = new THREE.Geometry(),

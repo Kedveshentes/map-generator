@@ -8,7 +8,7 @@ import { config } from './config';
 
 import './style.css';
 
-let dungeon = generate();
+let dungeon = generate(config);
 
 var game = new Game(dungeon);
 // game.start();
