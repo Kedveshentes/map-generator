@@ -111,12 +111,11 @@ function draw (config, labyrinth) {
 
 
 
-function generateLabyrinth (config) {
+function generate (config) {
 	let labyrinth = init(config);
 	labyrinth = generateFirstRoom(labyrinth, config);
 	labyrinth = generateRooms(config, labyrinth, 0);
-	labyrinth.config = config;
 	// draw(config, labyrinth);
 	return labyrinth;
 }
-export { generateLabyrinth };
+export { generate };

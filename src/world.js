@@ -7,7 +7,7 @@ class World {
 	constructor(labyrinth) {
 		this.scene = new THREE.Scene();
 
-		this.gameFieldGeometry = new THREE.PlaneGeometry((labyrinth.config.width + 1) * step, (labyrinth.config.height + 1) * step, 1 * step);
+		this.gameFieldGeometry = new THREE.PlaneGeometry((labyrinth.config.width + 10) * step, (labyrinth.config.height + 10) * step, 1 * step);
 		this.gameFieldMaterial = new THREE.MeshPhongMaterial({color : 0x9FCFEF});
 		this.gameField = new THREE.Mesh(this.gameFieldGeometry, this.gameFieldMaterial);
 		this.gameField.position.set(labyrinth.config.width / 2 * step, labyrinth.config.height / 2 * step, 0);
@@ -17,7 +17,7 @@ class World {
 		this.scene.add(this.gameField);
 
 		this.camera = new THREE.PerspectiveCamera(90, canvas.width / canvas.height, 0.1, 1000);
-		this.camera.position.set(10 * step, 10 * step, 8 * step);
+		this.camera.position.set((10 - 5) * step, (10 - 5) * step, 8 * step);
 
 		this.renderer = new THREE.WebGLRenderer();
 		this.renderer.setSize(canvas.width, canvas.height);
