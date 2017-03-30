@@ -25,6 +25,7 @@
   "dependencies": {
     "babel-polyfill": "^6.9.1",
     "babel-runtime": "^6.9.2",
+    "dungeon-map-generator": "^0.1.1",
     "fps": "0.0.3",
     "gl-matrix": "~2.3.0",
     "three": "^0.78.0",

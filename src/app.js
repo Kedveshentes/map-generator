@@ -2,8 +2,7 @@
 
 import * as _ from 'underscore';
 import { Game } from './game';
-// import { generate } from './labyrinth';
-import { generate } from '../../../dungeon-generator';
+import { generate } from 'dungeon-map-generator';
 
 import { config } from './config';
 
